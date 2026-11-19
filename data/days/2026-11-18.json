@@ -1,0 +1,47 @@
+
+{
+  "date": "2026-11-18",
+  "orbs": [
+    {
+      "id": "accidental-heroes",
+      "title": "The Accidental Heroes",
+      "type": "matching",
+      "instructions": "Match each person to the event they are associated with.",
+      "questions": [
+        {
+          "prompt": "Vasily Arkhipov",
+          "answer": "Prevented a nuclear torpedo launch"
+        },
+        {
+          "prompt": "Stanislav Petrov",
+          "answer": "Recognized a false nuclear alert"
+        },
+        {
+          "prompt": "Witold Pilecki",
+          "answer": "Voluntarily infiltrated Auschwitz"
+        }
+      ]
+    },
+    {
+      "id": "military-expressions",
+      "title": "Military Expressions",
+      "type": "matching",
+      "instructions": "Match the expressions to their origins.",
+      "questions": []
+    },
+    {
+      "id": "orb-three",
+      "title": "Example Orb Three",
+      "type": "matching",
+      "instructions": "Match the items.",
+      "questions": []
+    },
+    {
+      "id": "orb-four",
+      "title": "Example Orb Four",
+      "type": "matching",
+      "instructions": "Match the items.",
+      "questions": []
+    }
+  ]
+}
