@@ -1,4 +1,3 @@
-
 {
   "date": "2026-11-18",
   "orbs": [
@@ -20,28 +19,93 @@
           "prompt": "Witold Pilecki",
           "answer": "Voluntarily infiltrated Auschwitz"
         }
-      ]
+      ],
+      "thresholds": []
     },
     {
       "id": "military-expressions",
       "title": "Military Expressions",
       "type": "matching",
       "instructions": "Match the expressions to their origins.",
-      "questions": []
+      "questions": [],
+      "thresholds": []
     },
     {
-      "id": "orb-three",
-      "title": "Example Orb Three",
-      "type": "matching",
-      "instructions": "Match the items.",
-      "questions": []
+      "id": "categorization-test",
+      "title": "Historical Conflicts",
+      "type": "categorization",
+      "instructions": "Classify each conflict as either a World War I or World War II event.",
+      "thresholds": [2, 5, 9],
+      "categories": [
+        "World War I",
+        "World War II"
+      ],
+      "questions": [
+        {
+          "prompt": "Battle of the Somme",
+          "category": "World War I",
+          "explanation": "The battle took place in 1916 on the Western Front."
+        },
+        {
+          "prompt": "Battle of Stalingrad",
+          "category": "World War II",
+          "explanation": "The battle took place between 1942 and 1943."
+        },
+        {
+          "prompt": "Battle of Verdun",
+          "category": "World War I"
+        },
+        {
+          "prompt": "Battle of Midway",
+          "category": "World War II"
+        },
+        {
+          "prompt": "Gallipoli Campaign",
+          "category": "World War I"
+        },
+        {
+          "prompt": "Battle of Kursk",
+          "category": "World War II"
+        },
+        {
+          "prompt": "Battle of Tannenberg",
+          "category": "World War I"
+        },
+        {
+          "prompt": "Battle of El Alamein",
+          "category": "World War II"
+        },
+        {
+          "prompt": "Battle of Jutland",
+          "category": "World War I"
+        },
+        {
+          "prompt": "Battle of the Bulge",
+          "category": "World War II"
+        }
+      ]
     },
     {
-      "id": "orb-four",
-      "title": "Example Orb Four",
-      "type": "matching",
-      "instructions": "Match the items.",
-      "questions": []
+      "id": "short-answer-test",
+      "title": "Short Answer Test",
+      "type": "short-answer",
+      "instructions": "Answer each question.",
+      "thresholds": [1, 2, 3],
+      "questions": [
+        {
+          "prompt": "What is the capital of France?",
+          "answer": "Paris"
+        },
+        {
+          "prompt": "What is 7 multiplied by 8?",
+          "answer": "56"
+        },
+        {
+          "prompt": "Which planet is known as the Red Planet?",
+          "answer": "Mars",
+          "explanation": "Iron oxide on its surface gives Mars its reddish appearance."
+        }
+      ]
     }
   ]
 }
