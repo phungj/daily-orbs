@@ -28,14 +28,6 @@ export interface QuestionMedia {
     explanationImage?: QuestionImage;
 }
 
-export interface MatchingQuestion extends QuestionMedia {}
-
-export interface ShortAnswerQuestion extends QuestionMedia {}
-
-export interface CategorizationQuestion extends QuestionMedia {
-    category: string;
-}
-
 export interface MatchingQuestion extends QuestionMedia {
 
 }
@@ -92,3 +84,34 @@ export interface CategorizationOrb extends OrbBase {
     categories: string[];
     questions: CategorizationQuestion[];
 }
+
+export interface MatchingPair {
+    prompt: number;
+    answer: number;
+}
+
+export interface MatchingOrbState {
+    type: "matching";
+    selectedPrompt: number | null;
+    selectedAnswer: number | null;
+    matched: number[];
+    wrongPairs: MatchingPair[];
+    revealed: boolean;
+    shuffledPrompts: number[];
+    shuffledAnswers: number[];
+}
+
+export interface ShortAnswerOrbState {
+    type: "short-answer";
+    // We'll define these after seeing that component.
+}
+
+export interface CategorizationOrbState {
+    type: "categorization";
+    // We'll define these after seeing that component.
+}
+
+export type OrbInteractionState =
+    | MatchingOrbState
+    | ShortAnswerOrbState
+    | CategorizationOrbState;

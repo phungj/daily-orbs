@@ -1,14 +1,13 @@
 
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import {
     DailySet as DailySetData,
     GameSession,
 } from "@/data/days/days";
 import DayList from "./DayList";
 import DailySet from "@/components/DailySet";
-import MatchingOrbComponent from "@/components/MatchingOrbComponent";
 import OrbRenderer from "@/components/OrbRenderer";
 
 interface AppProps {
@@ -17,6 +16,75 @@ interface AppProps {
 
 const STARTING_HEARTS = 3;
 const DAILY_ORB_GOAL = 6;
+const STORAGE_KEY = "daily-orbs-sessions-v1";
+
+const EMPTY_SESSION: GameSession = {
+    events: [],
+    progress: {},
+};
+
+function createInitialSession(day: DailySetData): GameSession {
+    const progress: GameSession["progress"] = {};
+
+    for (const orb of day.orbs) {
+        progress[orb.id] = {
+            correctAnswers: 0,
+            heartsRemaining: STARTING_HEARTS,
+            earnedOrbs: 0,
+            completed: false,
+        };
+    }
+
+    return {
+        events: [],
+        progress,
+    };
+}
+
+// Basic validation before trusting data loaded from localStorage.
+function isStoredSessions(
+    value: unknown
+): value is Record<string, GameSession> {
+    if (
+        typeof value !== "object" ||
+        value === null ||
+        Array.isArray(value)
+    ) {
+        return false;
+    }
+
+    return Object.values(value).every(session => {
+        if (
+            typeof session !== "object" ||
+            session === null ||
+            !Array.isArray(session.events) ||
+            typeof session.progress !== "object" ||
+            session.progress === null ||
+            Array.isArray(session.progress)
+        ) {
+            return false;
+        }
+
+        const validEvents = session.events.every(event =>
+            event !== null &&
+            typeof event === "object" &&
+            (event.type === "orb-earned" || event.type === "heart-lost") &&
+            typeof event.orbId === "string" &&
+            typeof event.timestamp === "number"
+        );
+
+        const validProgress = Object.values(session.progress).every(progress =>
+            progress !== null &&
+            typeof progress === "object" &&
+            typeof progress.correctAnswers === "number" &&
+            typeof progress.heartsRemaining === "number" &&
+            typeof progress.earnedOrbs === "number" &&
+            typeof progress.completed === "boolean"
+        );
+
+        return validEvents && validProgress;
+    });
+}
 
 export default function App({ days }: AppProps) {
     const [selectedDay, setSelectedDay] =
@@ -25,29 +93,75 @@ export default function App({ days }: AppProps) {
     const [selectedOrbId, setSelectedOrbId] =
         useState<string | null>(null);
 
-    const [session, setSession] = useState<GameSession>({
-        events: [],
-        progress: {},
-    });
+    const [sessions, setSessions] = useState<
+        Record<string, GameSession>
+    >({});
+
+    const [isLoaded, setIsLoaded] = useState(false);
+
+    // Load saved progress once when the app starts.
+    useEffect(() => {
+        try {
+            const saved = localStorage.getItem(STORAGE_KEY);
+
+            if (saved) {
+                const parsed: unknown = JSON.parse(saved);
+
+                if (isStoredSessions(parsed)) {
+                    setSessions(parsed);
+                }
+            }
+        } catch (error) {
+            console.error("Could not load saved game progress:", error);
+        }
+
+        setIsLoaded(true);
+    }, []);
+
+    // Save progress whenever sessions change.
+    useEffect(() => {
+        if (!isLoaded) return;
+
+        try {
+            localStorage.setItem(
+                STORAGE_KEY,
+                JSON.stringify(sessions)
+            );
+        } catch (error) {
+            console.error("Could not save game progress:", error);
+        }
+    }, [sessions, isLoaded]);
+
+    const session = selectedDay
+        ? sessions[selectedDay.date] ?? createInitialSession(selectedDay)
+        : EMPTY_SESSION;
+
+    function updateSession(
+        update: (previous: GameSession) => GameSession
+    ) {
+        if (!selectedDay) return;
+
+        const date = selectedDay.date;
+
+        setSessions(previous => ({
+            ...previous,
+            [date]: update(
+                previous[date] ?? createInitialSession(selectedDay)
+            ),
+        }));
+    }
 
     function startDay(day: DailySetData) {
         setSelectedDay(day);
         setSelectedOrbId(null);
 
-        const initialProgress: GameSession["progress"] = {};
+        setSessions(previous => {
+            if (previous[day.date]) return previous;
 
-        for (const orb of day.orbs) {
-            initialProgress[orb.id] = {
-                correctAnswers: 0,
-                heartsRemaining: STARTING_HEARTS,
-                earnedOrbs: 0,
-                completed: false,
+            return {
+                ...previous,
+                [day.date]: createInitialSession(day),
             };
-        }
-
-        setSession({
-            events: [],
-            progress: initialProgress,
         });
     }
 
@@ -60,7 +174,7 @@ export default function App({ days }: AppProps) {
 
         const timestamp = Date.now();
 
-        setSession(previous => {
+        updateSession(previous => {
             const current = previous.progress[orbId];
 
             if (!current || current.completed) {
@@ -108,7 +222,7 @@ export default function App({ days }: AppProps) {
     function handleIncorrectAnswer(orbId: string) {
         const timestamp = Date.now();
 
-        setSession(previous => {
+        updateSession(previous => {
             const current = previous.progress[orbId];
 
             if (
@@ -141,7 +255,7 @@ export default function App({ days }: AppProps) {
     }
 
     function handleComplete(orbId: string) {
-        setSession(previous => {
+        updateSession(previous => {
             const current = previous.progress[orbId];
 
             if (!current || current.completed) {
@@ -193,9 +307,7 @@ export default function App({ days }: AppProps) {
                 result.push(symbols[orb.category].orb);
                 earnedCount++;
 
-                if (
-                    earnedCount === DAILY_ORB_GOAL
-                ) {
+                if (earnedCount === DAILY_ORB_GOAL) {
                     result.push("🏆");
                 }
             } else {
@@ -223,6 +335,15 @@ export default function App({ days }: AppProps) {
         ? session.progress[selectedOrbId]
         : null;
 
+    const completedDates = days
+        .filter(day =>
+            day.orbs.length > 0 &&
+            day.orbs.every(
+                orb => sessions[day.date]?.progress[orb.id]?.completed
+            )
+        )
+        .map(day => day.date);
+
     return (
         <main className="container mx-auto max-w-3xl p-4">
             {selectedDay === null ? (
@@ -233,6 +354,7 @@ export default function App({ days }: AppProps) {
 
                     <DayList
                         days={days}
+                        completedDates={completedDates}
                         onSelectDay={startDay}
                     />
                 </>
@@ -244,15 +366,6 @@ export default function App({ days }: AppProps) {
                     >
                         ← Back to days
                     </button>
-
-                    <div className="mb-4 text-center">
-                        <h2 className="text-xl font-bold">
-                            Daily progress
-                        </h2>
-                        <p className="text-base-content/70">
-                            {totalEarnedOrbs} / {DAILY_ORB_GOAL} orbs earned
-                        </p>
-                    </div>
 
                     <DailySet
                         day={selectedDay}
@@ -303,12 +416,14 @@ export default function App({ days }: AppProps) {
                         )}
                     </div>
 
-                    <button
-                        className="btn btn-outline btn-sm mt-4"
-                        onClick={handleShare}
-                    >
-                        Share results
-                    </button>
+                    <div className="mt-4 flex justify-center">
+                        <button
+                            className="btn btn-outline btn-sm p-2 rounded-lg border border-base-300"
+                            onClick={handleShare}
+                        >
+                            Share results
+                        </button>
+                    </div>
                 </>
             ) : (
                 <>

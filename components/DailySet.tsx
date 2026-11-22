@@ -46,10 +46,7 @@ export default function DailySet({
                             <div className="card-body">
                                 <div className="flex items-center justify-between gap-4">
                                     <div className="min-w-0">
-                                        <div className={`text-sm ${style.title}`}>
-                                            ORB {index + 1}
-                                        </div>
-                                        <h2 className="card-title">
+                                        <h2 className={`card-title font-bold ${style.title}`}>
                                             {orb.title}
                                         </h2>
                                     </div>
