@@ -161,6 +161,55 @@ export default function App({ days }: AppProps) {
         });
     }
 
+    async function handleShare() {
+        if (!selectedDay) return;
+
+        const symbols = {
+            language: { orb: "🟠", heart: "🧡" },
+            science: { orb: "🟢", heart: "💚" },
+            geography: { orb: "🔵", heart: "💙" },
+            "pop-culture": { orb: "🟣", heart: "💜" },
+        };
+
+        const date = new Date(
+            selectedDay.date + "T12:00:00"
+        ).toLocaleDateString("en-US", {
+            month: "long",
+            day: "numeric",
+            year: "numeric",
+        }).replace(",", "");
+
+        const result: string[] = [];
+        let earnedCount = 0;
+
+        for (const event of session.events) {
+            const orb = selectedDay.orbs.find(
+                item => item.id === event.orbId
+            );
+
+            if (!orb) continue;
+
+            if (event.type === "orb-earned") {
+                result.push(symbols[orb.category].orb);
+                earnedCount++;
+
+                if (
+                    earnedCount === DAILY_ORB_GOAL
+                ) {
+                    result.push("🏆");
+                }
+            } else {
+                result.push(symbols[orb.category].heart);
+            }
+        }
+
+        const shareText = `DailyOrbs ${date}\n${result.join("")}`;
+
+        await navigator.clipboard.writeText(shareText);
+
+        alert("Results copied to clipboard!");
+    }
+
     const totalEarnedOrbs = Object.values(session.progress).reduce(
         (total, item) => total + item.earnedOrbs,
         0
@@ -179,7 +228,7 @@ export default function App({ days }: AppProps) {
             {selectedDay === null ? (
                 <>
                     <h1 className="text-3xl font-bold mb-6 text-center">
-                        Daily Orbs
+                        Jon's Daily Orbs
                     </h1>
 
                     <DayList
@@ -207,6 +256,7 @@ export default function App({ days }: AppProps) {
 
                     <DailySet
                         day={selectedDay}
+                        progress={session.progress}
                         onSelectOrb={setSelectedOrbId}
                     />
 
@@ -252,6 +302,13 @@ export default function App({ days }: AppProps) {
                             </ol>
                         )}
                     </div>
+
+                    <button
+                        className="btn btn-outline btn-sm mt-4"
+                        onClick={handleShare}
+                    >
+                        Share results
+                    </button>
                 </>
             ) : (
                 <>

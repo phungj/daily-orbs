@@ -1,13 +1,21 @@
-import { DailySet as DailySetData } from "@/data/days/days";
+
+import {
+    DailySet as DailySetData,
+    OrbProgress,
+} from "@/data/days/days";
+import {orbStyles} from "@/components/orbStyles";
+import OrbStatus from "@/components/OrbStatus";
 
 interface DailySetProps {
     day: DailySetData;
+    progress: Record<string, OrbProgress>;
     onSelectOrb: (orbId: string) => void;
 }
 
 export default function DailySet({
                                      day,
-                                     onSelectOrb
+                                     progress,
+                                     onSelectOrb,
                                  }: DailySetProps) {
     return (
         <div className="flex flex-col gap-3">
@@ -18,32 +26,48 @@ export default function DailySet({
                         {
                             year: "numeric",
                             month: "long",
-                            day: "numeric"
+                            day: "numeric",
                         }
                     )}
                 </h1>
             </div>
 
-            <div className="grid grid-cols-1 sm:grid-cols-1 gap-3">
-                {day.orbs.map((orb, index) => (
-                    <button
-                        key={orb.id}
-                        className="card bg-base-200 hover:bg-base-300 transition-colors text-left"
-                        onClick={() => onSelectOrb(orb.id)}
-                    >
-                        <div className="card-body">
-                            <div className="text-sm text-base-content/50">
-                                ORB {index + 1}
+            <div className="grid grid-cols-1 gap-3">
+                {day.orbs.map((orb, index) => {
+                    const orbProgress = progress[orb.id];
+                    const style = orbStyles[orb.category];
+
+                    return (
+                        <button
+                            key={orb.id}
+                            className="card bg-base-200 hover:bg-base-300 transition-colors text-left"
+                            onClick={() => onSelectOrb(orb.id)}
+                        >
+                            <div className="card-body">
+                                <div className="flex items-center justify-between gap-4">
+                                    <div className="min-w-0">
+                                        <div className={`text-sm ${style.title}`}>
+                                            ORB {index + 1}
+                                        </div>
+                                        <h2 className="card-title">
+                                            {orb.title}
+                                        </h2>
+                                    </div>
+
+                                    <OrbStatus
+                                        category={orb.category}
+                                        earnedOrbs={orbProgress?.earnedOrbs ?? 0}
+                                        heartsRemaining={orbProgress?.heartsRemaining ?? 3}
+                                    />
+                                </div>
+
+                                <p className="text-sm text-base-content/60">
+                                    {orb.instructions}
+                                </p>
                             </div>
-                            <h2 className="card-title">
-                                {orb.title}
-                            </h2>
-                            <p className="text-sm text-base-content/60">
-                                {orb.instructions}
-                            </p>
-                        </div>
-                    </button>
-                ))}
+                        </button>
+                    );
+                })}
             </div>
         </div>
     );

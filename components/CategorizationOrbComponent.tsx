@@ -2,7 +2,9 @@
 "use client";
 
 import { useState } from "react";
+import Image from "next/image";
 import { CategorizationOrb as CategorizationOrbData } from "@/data/days/days";
+import OrbStatus from "@/components/OrbStatus";
 
 interface CategorizationOrbProps {
     orb: CategorizationOrbData;
@@ -56,6 +58,54 @@ export default function CategorizationOrbComponent({
     const answeredCount = Object.keys(responses).length;
     const complete = revealed || answeredCount === orb.questions.length;
 
+    function renderPrompt(index: number) {
+        const question = orb.questions[index];
+
+        return (
+            <div className="flex flex-col gap-2 flex-1">
+                {question.prompt && (
+                    <p className="font-semibold">{question.prompt}</p>
+                )}
+
+                {question.promptImage && (
+                    <Image
+                        src={question.promptImage.src}
+                        alt={question.promptImage.alt}
+                        width={640}
+                        height={480}
+                        unoptimized
+                        className="max-h-64 w-auto max-w-full rounded-lg object-contain"
+                    />
+                )}
+            </div>
+        );
+    }
+
+    function renderExplanation(index: number) {
+        const question = orb.questions[index];
+
+        return (
+            <>
+                {question.explanation && (
+                    <p className="mt-1 text-base-content/70">
+                        {question.explanation}
+                    </p>
+                )}
+
+                {question.explanationImage && (
+                    <Image
+                        src={question.explanationImage.src}
+                        alt={question.explanationImage.alt}
+                        width={640}
+                        height={480}
+                        unoptimized
+                        className="mt-2 max-h-64 w-auto max-w-full rounded-lg object-contain"
+                    />
+                )}
+            </>
+        );
+    }
+
     return (
         <div className="flex flex-col gap-6">
             <div>
@@ -76,29 +126,11 @@ export default function CategorizationOrbComponent({
                     </p>
                 </div>
 
-                <div className="flex flex-col items-end gap-1">
-                    <div className="flex items-center gap-1">
-                        {Array.from({ length: 3 }, (_, index) => (
-                            <span
-                                key={index}
-                                className={index < earnedOrbs ? "text-warning" : "text-base-300"}
-                            >
-                                {index < earnedOrbs ? "●" : "○"}
-                            </span>
-                        ))}
-                    </div>
-
-                    <div className="flex items-center gap-1">
-                        {Array.from({ length: 3 }, (_, index) => (
-                            <span
-                                key={index}
-                                className={index < heartsRemaining ? "text-error" : "text-base-300"}
-                            >
-                                {index < heartsRemaining ? "♥" : "♡"}
-                            </span>
-                        ))}
-                    </div>
-                </div>
+                <OrbStatus
+                    category={orb.category}
+                    earnedOrbs={earnedOrbs}
+                    heartsRemaining={heartsRemaining}
+                />
             </div>
 
             <div className="flex flex-col gap-3">
@@ -114,9 +146,7 @@ export default function CategorizationOrbComponent({
                             className="flex flex-col gap-2 py-3"
                         >
                             <div className="flex flex-col sm:flex-row sm:items-center gap-3">
-                                <p className="font-semibold flex-1">
-                                    {question.prompt}
-                                </p>
+                                {renderPrompt(index)}
 
                                 {!answered && !revealed && (
                                     <div className="flex flex-wrap gap-2 sm:justify-end">
@@ -152,11 +182,7 @@ export default function CategorizationOrbComponent({
                                             : "Incorrect. The answer is " + question.category + "."}
                                     </p>
 
-                                    {question.explanation && (
-                                        <p className="mt-1 text-base-content/70">
-                                            {question.explanation}
-                                        </p>
-                                    )}
+                                    {renderExplanation(index)}
                                 </div>
                             )}
 
@@ -166,11 +192,7 @@ export default function CategorizationOrbComponent({
                                         Answer: {question.category}.
                                     </p>
 
-                                    {question.explanation && (
-                                        <p className="mt-1 text-base-content/70">
-                                            {question.explanation}
-                                        </p>
-                                    )}
+                                    {renderExplanation(index)}
                                 </div>
                             )}
                         </div>

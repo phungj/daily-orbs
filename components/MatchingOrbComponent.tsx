@@ -2,7 +2,9 @@
 "use client";
 
 import { useState } from "react";
+import Image from "next/image";
 import { MatchingOrb } from "@/data/days/days";
+import OrbStatus from "@/components/OrbStatus";
 
 interface OrbProps {
     orb: MatchingOrb;
@@ -19,13 +21,13 @@ interface Pair {
 }
 
 export default function MatchingOrbComponent({
-                                orb,
-                                heartsRemaining,
-                                earnedOrbs,
-                                onCorrectAnswer,
-                                onIncorrectAnswer,
-                                onComplete,
-                            }: OrbProps) {
+                                                 orb,
+                                                 heartsRemaining,
+                                                 earnedOrbs,
+                                                 onCorrectAnswer,
+                                                 onIncorrectAnswer,
+                                                 onComplete,
+                                             }: OrbProps) {
     const [selectedPrompt, setSelectedPrompt] =
         useState<number | null>(null);
 
@@ -39,7 +41,6 @@ export default function MatchingOrbComponent({
     const [shuffledPrompts] = useState(() =>
         orb.questions
             .map((question, index) => ({
-                prompt: question.prompt,
                 originalIndex: index,
             }))
             .sort(() => Math.random() - 0.5)
@@ -48,7 +49,6 @@ export default function MatchingOrbComponent({
     const [shuffledAnswers] = useState(() =>
         orb.questions
             .map((question, index) => ({
-                answer: question.answer,
                 originalIndex: index,
             }))
             .sort(() => Math.random() - 0.5)
@@ -149,8 +149,76 @@ export default function MatchingOrbComponent({
         item => !matched.includes(item.originalIndex)
     );
 
-    const remainingAnswers = shuffledAnswers
-        .filter(item => !matched.includes(item.originalIndex));
+    const remainingAnswers = shuffledAnswers.filter(
+        item => !matched.includes(item.originalIndex)
+    );
+
+    function renderPrompt(index: number) {
+        const question = orb.questions[index];
+
+        return (
+            <div className="flex flex-col items-center gap-2">
+                {question.prompt && <span>{question.prompt}</span>}
+
+                {question.promptImage && (
+                    <Image
+                        src={question.promptImage.src}
+                        alt={question.promptImage.alt}
+                        width={640}
+                        height={480}
+                        unoptimized
+                        className="max-h-48 max-w-full w-auto rounded-lg object-contain"
+                    />
+                )}
+            </div>
+        );
+    }
+
+    function renderAnswer(index: number) {
+        const question = orb.questions[index];
+
+        return (
+            <div className="flex flex-col items-center gap-2">
+                {question.answer && <span>{question.answer}</span>}
+
+                {question.answerImage && (
+                    <Image
+                        src={question.answerImage.src}
+                        alt={question.answerImage.alt}
+                        width={640}
+                        height={480}
+                        unoptimized
+                        className="max-h-48 max-w-full w-auto rounded-lg object-contain"
+                    />
+                )}
+            </div>
+        );
+    }
+
+    function renderExplanation(index: number) {
+        const question = orb.questions[index];
+
+        return (
+            <>
+                {question.explanation && (
+                    <p className="text-sm text-base-content/70 pl-1">
+                        {question.explanation}
+                    </p>
+                )}
+
+                {question.explanationImage && (
+                    <Image
+                        src={question.explanationImage.src}
+                        alt={question.explanationImage.alt}
+                        width={640}
+                        height={480}
+                        unoptimized
+                        className="max-h-64 w-auto rounded-lg object-contain"
+                    />
+                )}
+            </>
+        );
+    }
 
     return (
         <div className="flex flex-col gap-6">
@@ -161,31 +229,11 @@ export default function MatchingOrbComponent({
                 </p>
             </div>
 
-            <div className="flex flex-col items-end gap-1">
-                {/* Orbs */}
-                <div className="flex items-center gap-1" aria-label={`${earnedOrbs} of 3 orbs earned`}>
-                    {Array.from({ length: 3 }, (_, index) => (
-                        <span
-                            key={index}
-                            className={index < earnedOrbs ? "text-warning" : "text-base-300"}
-                        >
-                {index < earnedOrbs ? "●" : "○"}
-            </span>
-                    ))}
-                </div>
-
-                {/* Hearts */}
-                <div className="flex items-center gap-1" aria-label={`${heartsRemaining} of 3 hearts remaining`}>
-                    {Array.from({ length: 3 }, (_, index) => (
-                        <span
-                            key={index}
-                            className={index < heartsRemaining ? "text-error" : "text-base-300"}
-                        >
-                {index < heartsRemaining ? "♥" : "♡"}
-            </span>
-                    ))}
-                </div>
-            </div>
+            <OrbStatus
+                category={orb.category}
+                earnedOrbs={earnedOrbs}
+                heartsRemaining={heartsRemaining}
+            />
 
             {!revealed && !complete && (
                 <>
@@ -201,7 +249,7 @@ export default function MatchingOrbComponent({
                                     className={`btn h-auto min-h-16 whitespace-normal text-wrap transition-colors ${getButtonClass(item.originalIndex, "prompt")}`}
                                     onClick={() => selectPrompt(item.originalIndex)}
                                 >
-                                    {item.prompt}
+                                    {renderPrompt(item.originalIndex)}
                                 </button>
                             ))}
                         </div>
@@ -217,7 +265,7 @@ export default function MatchingOrbComponent({
                                     className={`btn h-auto min-h-16 whitespace-normal text-wrap transition-colors ${getButtonClass(item.originalIndex, "answer")}`}
                                     onClick={() => selectAnswer(item.originalIndex)}
                                 >
-                                    {item.answer}
+                                    {renderAnswer(item.originalIndex)}
                                 </button>
                             ))}
                         </div>
@@ -236,7 +284,7 @@ export default function MatchingOrbComponent({
                 <div key={index} className="flex flex-col gap-2">
                     <div className="flex flex-col sm:flex-row gap-2 items-stretch sm:items-center">
                         <div className="flex-1 rounded-lg border border-success/40 p-3">
-                            {orb.questions[index].prompt}
+                            {renderPrompt(index)}
                         </div>
 
                         <div className="hidden sm:block text-success">
@@ -244,15 +292,11 @@ export default function MatchingOrbComponent({
                         </div>
 
                         <div className="flex-1 rounded-lg border border-success/40 p-3">
-                            {orb.questions[index].answer}
+                            {renderAnswer(index)}
                         </div>
                     </div>
 
-                    {orb.questions[index].explanation && (
-                        <p className="text-sm text-base-content/70 pl-1">
-                            {orb.questions[index].explanation}
-                        </p>
-                    )}
+                    {renderExplanation(index)}
                 </div>
             ))}
 
@@ -262,7 +306,7 @@ export default function MatchingOrbComponent({
                     className="flex flex-col sm:flex-row gap-2 items-stretch sm:items-center"
                 >
                     <div className="flex-1 rounded-lg bg-error/10 border border-error/40 p-3">
-                        {orb.questions[pair.prompt].prompt}
+                        {renderPrompt(pair.prompt)}
                     </div>
 
                     <div className="hidden sm:block text-error font-bold">
@@ -270,7 +314,7 @@ export default function MatchingOrbComponent({
                     </div>
 
                     <div className="flex-1 rounded-lg bg-error/10 border border-error/40 p-3">
-                        {orb.questions[pair.answer].answer}
+                        {renderAnswer(pair.answer)}
                     </div>
                 </div>
             ))}
@@ -279,7 +323,7 @@ export default function MatchingOrbComponent({
                 <div key={item.originalIndex} className="flex flex-col gap-2">
                     <div className="flex flex-col sm:flex-row gap-2 items-stretch sm:items-center">
                         <div className="flex-1 rounded-lg border border-base-300 p-3">
-                            {item.prompt}
+                            {renderPrompt(item.originalIndex)}
                         </div>
 
                         <div className="hidden sm:block text-base-content/50">
@@ -287,15 +331,11 @@ export default function MatchingOrbComponent({
                         </div>
 
                         <div className="flex-1 rounded-lg border border-base-300 p-3">
-                            {orb.questions[item.originalIndex].answer}
+                            {renderAnswer(item.originalIndex)}
                         </div>
                     </div>
 
-                    {orb.questions[item.originalIndex].explanation && (
-                        <p className="text-sm text-base-content/70 pl-1">
-                            {orb.questions[item.originalIndex].explanation}
-                        </p>
-                    )}
+                    {renderExplanation(item.originalIndex)}
                 </div>
             ))}
 

@@ -1,15 +1,43 @@
+export type OrbCategory =
+    | "language"
+    | "science"
+    | "geography"
+    | "pop-culture";
 
 export interface OrbBase {
     id: string;
     title: string;
+    category: OrbCategory;
     instructions: string;
     thresholds: number[];
 }
 
-export interface MatchingQuestion {
-    prompt: string;
-    answer: string;
+export interface QuestionImage {
+    src: string;
+    alt: string;
+}
+
+export interface QuestionMedia {
+    prompt?: string;
+    promptImage?: QuestionImage;
+
+    answer?: string;
+    answerImage?: QuestionImage;
+
     explanation?: string;
+    explanationImage?: QuestionImage;
+}
+
+export interface MatchingQuestion extends QuestionMedia {}
+
+export interface ShortAnswerQuestion extends QuestionMedia {}
+
+export interface CategorizationQuestion extends QuestionMedia {
+    category: string;
+}
+
+export interface MatchingQuestion extends QuestionMedia {
+
 }
 
 export interface MatchingOrb extends OrbBase {
@@ -17,10 +45,8 @@ export interface MatchingOrb extends OrbBase {
     questions: MatchingQuestion[];
 }
 
-export interface ShortAnswerQuestion {
-    prompt: string;
-    answer: string;
-    explanation?: string;
+export interface ShortAnswerQuestion extends QuestionMedia {
+    answer: string
 }
 
 export interface ShortAnswerOrb extends OrbBase {
@@ -57,10 +83,8 @@ export interface GameSession {
 }
 
 
-export interface CategorizationQuestion {
-    prompt: string;
+export interface CategorizationQuestion extends QuestionMedia {
     category: string;
-    explanation?: string;
 }
 
 export interface CategorizationOrb extends OrbBase {

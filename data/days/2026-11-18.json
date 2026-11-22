@@ -4,6 +4,7 @@
     {
       "id": "accidental-heroes",
       "title": "The Accidental Heroes",
+      "category": "language",
       "type": "matching",
       "instructions": "Match each person to the event they are associated with.",
       "questions": [
@@ -25,14 +26,29 @@
     {
       "id": "military-expressions",
       "title": "Military Expressions",
+      "category": "science",
       "type": "matching",
       "instructions": "Match the expressions to their origins.",
-      "questions": [],
+      "questions": [
+        {
+          "prompt": "Vasily Arkhipov",
+          "answer": "Prevented a nuclear torpedo launch"
+        },
+        {
+          "prompt": "Stanislav Petrov",
+          "answer": "Recognized a false nuclear alert"
+        },
+        {
+          "prompt": "Witold Pilecki",
+          "answer": "Voluntarily infiltrated Auschwitz"
+        }
+      ],
       "thresholds": []
     },
     {
       "id": "categorization-test",
       "title": "Historical Conflicts",
+      "category": "geography",
       "type": "categorization",
       "instructions": "Classify each conflict as either a World War I or World War II event.",
       "thresholds": [2, 5, 9],
@@ -89,6 +105,7 @@
       "id": "short-answer-test",
       "title": "Short Answer Test",
       "type": "short-answer",
+      "category": "pop-culture",
       "instructions": "Answer each question.",
       "thresholds": [1, 2, 3],
       "questions": [
