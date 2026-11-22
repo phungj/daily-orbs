@@ -1,15 +1,19 @@
 
 "use client";
 
-import { useState } from "react";
 import Image from "next/image";
-import { MatchingOrb } from "@/data/days/days";
+import {
+    MatchingOrb,
+    MatchingOrbState,
+} from "@/data/days/days";
 import OrbStatus from "@/components/OrbStatus";
 
 interface OrbProps {
     orb: MatchingOrb;
     heartsRemaining: number;
     earnedOrbs: number;
+    state: MatchingOrbState;
+    onStateChange: (state: MatchingOrbState) => void;
     onCorrectAnswer: (orbId: string) => void;
     onIncorrectAnswer: (orbId: string) => void;
     onComplete: (orbId: string) => void;
@@ -24,37 +28,30 @@ export default function MatchingOrbComponent({
                                                  orb,
                                                  heartsRemaining,
                                                  earnedOrbs,
+                                                 state,
+                                                 onStateChange,
                                                  onCorrectAnswer,
                                                  onIncorrectAnswer,
                                                  onComplete,
                                              }: OrbProps) {
-    const [selectedPrompt, setSelectedPrompt] =
-        useState<number | null>(null);
-
-    const [selectedAnswer, setSelectedAnswer] =
-        useState<number | null>(null);
-
-    const [matched, setMatched] = useState<number[]>([]);
-    const [wrongPairs, setWrongPairs] = useState<Pair[]>([]);
-    const [revealed, setRevealed] = useState(false);
-
-    const [shuffledPrompts] = useState(() =>
-        orb.questions
-            .map((question, index) => ({
-                originalIndex: index,
-            }))
-            .sort(() => Math.random() - 0.5)
-    );
-
-    const [shuffledAnswers] = useState(() =>
-        orb.questions
-            .map((question, index) => ({
-                originalIndex: index,
-            }))
-            .sort(() => Math.random() - 0.5)
-    );
+    const {
+        selectedPrompt,
+        selectedAnswer,
+        matched,
+        wrongPairs,
+        revealed,
+        shuffledPrompts,
+        shuffledAnswers,
+    } = state;
 
     const complete = matched.length === orb.questions.length;
+
+    function updateState(updates: Partial<MatchingOrbState>) {
+        onStateChange({
+            ...state,
+            ...updates,
+        });
+    }
 
     function checkPair(
         promptIndex: number | null,
@@ -72,14 +69,19 @@ export default function MatchingOrbComponent({
         if (promptIndex === answerIndex) {
             const newMatched = [...matched, promptIndex];
 
-            setMatched(newMatched);
+            updateState({
+                matched: newMatched,
+                selectedPrompt: null,
+                selectedAnswer: null,
+            });
+
             onCorrectAnswer(orb.id);
 
             if (newMatched.length === orb.questions.length) {
                 onComplete(orb.id);
             }
         } else {
-            const pair = {
+            const pair: Pair = {
                 prompt: promptIndex,
                 answer: answerIndex,
             };
@@ -90,14 +92,18 @@ export default function MatchingOrbComponent({
                     item.answer === pair.answer
             );
 
+            updateState({
+                wrongPairs: alreadyRecorded
+                    ? wrongPairs
+                    : [...wrongPairs, pair],
+                selectedPrompt: null,
+                selectedAnswer: null,
+            });
+
             if (!alreadyRecorded) {
-                setWrongPairs(previous => [...previous, pair]);
                 onIncorrectAnswer(orb.id);
             }
         }
-
-        setSelectedPrompt(null);
-        setSelectedAnswer(null);
     }
 
     function selectPrompt(index: number) {
@@ -106,7 +112,9 @@ export default function MatchingOrbComponent({
         if (selectedAnswer !== null) {
             checkPair(index, selectedAnswer);
         } else {
-            setSelectedPrompt(index);
+            updateState({
+                selectedPrompt: index,
+            });
         }
     }
 
@@ -116,7 +124,9 @@ export default function MatchingOrbComponent({
         if (selectedPrompt !== null) {
             checkPair(selectedPrompt, index);
         } else {
-            setSelectedAnswer(index);
+            updateState({
+                selectedAnswer: index,
+            });
         }
     }
 
@@ -139,18 +149,21 @@ export default function MatchingOrbComponent({
     function revealAnswers() {
         if (revealed || complete) return;
 
-        setRevealed(true);
-        setSelectedPrompt(null);
-        setSelectedAnswer(null);
+        updateState({
+            revealed: true,
+            selectedPrompt: null,
+            selectedAnswer: null,
+        });
+
         onComplete(orb.id);
     }
 
     const remainingPrompts = shuffledPrompts.filter(
-        item => !matched.includes(item.originalIndex)
+        index => !matched.includes(index)
     );
 
     const remainingAnswers = shuffledAnswers.filter(
-        item => !matched.includes(item.originalIndex)
+        index => !matched.includes(index)
     );
 
     function renderPrompt(index: number) {
@@ -222,50 +235,52 @@ export default function MatchingOrbComponent({
 
     return (
         <div className="flex flex-col gap-6">
-            <div>
-                <h1 className="text-2xl font-bold">{orb.title}</h1>
-                <p className="text-base-content/70 mt-2">
-                    {orb.instructions}
-                </p>
-            </div>
+            <div className="flex flex-wrap items-center justify-between gap-4">
+                <div className="flex-1 min-w-0">
+                    <h1 className="text-2xl font-bold">{orb.title}</h1>
+                    <p className="text-base-content/70 mt-1">
+                        {orb.instructions}
+                    </p>
+                </div>
 
-            <OrbStatus
-                category={orb.category}
-                earnedOrbs={earnedOrbs}
-                heartsRemaining={heartsRemaining}
-            />
+                <OrbStatus
+                    category={orb.category}
+                    earnedOrbs={earnedOrbs}
+                    heartsRemaining={heartsRemaining}
+                />
+            </div>
 
             {!revealed && !complete && (
                 <>
                     <div className="grid grid-cols-2 gap-4">
                         <div className="flex flex-col gap-2">
                             <h2 className="font-bold text-center">
-                                Prompts
+                                {orb.promptLabel}
                             </h2>
 
-                            {remainingPrompts.map(item => (
+                            {remainingPrompts.map(index => (
                                 <button
-                                    key={item.originalIndex}
-                                    className={`btn h-auto min-h-16 whitespace-normal text-wrap transition-colors ${getButtonClass(item.originalIndex, "prompt")}`}
-                                    onClick={() => selectPrompt(item.originalIndex)}
+                                    key={index}
+                                    className={`btn h-auto min-h-16 whitespace-normal text-wrap transition-colors ${getButtonClass(index, "prompt")}`}
+                                    onClick={() => selectPrompt(index)}
                                 >
-                                    {renderPrompt(item.originalIndex)}
+                                    {renderPrompt(index)}
                                 </button>
                             ))}
                         </div>
 
                         <div className="flex flex-col gap-2">
                             <h2 className="font-bold text-center">
-                                Answers
+                                {orb.answerLabel}
                             </h2>
 
-                            {remainingAnswers.map(item => (
+                            {remainingAnswers.map(index => (
                                 <button
-                                    key={item.originalIndex}
-                                    className={`btn h-auto min-h-16 whitespace-normal text-wrap transition-colors ${getButtonClass(item.originalIndex, "answer")}`}
-                                    onClick={() => selectAnswer(item.originalIndex)}
+                                    key={index}
+                                    className={`btn h-auto min-h-16 whitespace-normal text-wrap transition-colors ${getButtonClass(index, "answer")}`}
+                                    onClick={() => selectAnswer(index)}
                                 >
-                                    {renderAnswer(item.originalIndex)}
+                                    {renderAnswer(index)}
                                 </button>
                             ))}
                         </div>
@@ -275,7 +290,7 @@ export default function MatchingOrbComponent({
                         className="btn btn-outline btn-sm self-center rounded-lg border border-base-300 p-2"
                         onClick={revealAnswers}
                     >
-                        Reveal remaining answers
+                        Reveal Answers
                     </button>
                 </>
             )}
@@ -319,11 +334,11 @@ export default function MatchingOrbComponent({
                 </div>
             ))}
 
-            {revealed && remainingPrompts.map(item => (
-                <div key={item.originalIndex} className="flex flex-col gap-2">
+            {revealed && remainingPrompts.map(index => (
+                <div key={index} className="flex flex-col gap-2">
                     <div className="flex flex-col sm:flex-row gap-2 items-stretch sm:items-center">
                         <div className="flex-1 rounded-lg border border-base-300 p-3">
-                            {renderPrompt(item.originalIndex)}
+                            {renderPrompt(index)}
                         </div>
 
                         <div className="hidden sm:block text-base-content/50">
@@ -331,19 +346,13 @@ export default function MatchingOrbComponent({
                         </div>
 
                         <div className="flex-1 rounded-lg border border-base-300 p-3">
-                            {renderAnswer(item.originalIndex)}
+                            {renderAnswer(index)}
                         </div>
                     </div>
 
-                    {renderExplanation(item.originalIndex)}
+                    {renderExplanation(index)}
                 </div>
             ))}
-
-            {complete && (
-                <div className="alert alert-success">
-                    All pairs matched! Well done.
-                </div>
-            )}
         </div>
     );
 }

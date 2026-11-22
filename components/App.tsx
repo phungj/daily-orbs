@@ -4,7 +4,7 @@
 import { useEffect, useState } from "react";
 import {
     DailySet as DailySetData,
-    GameSession,
+    GameSession, Orb, OrbInteractionState,
 } from "@/data/days/days";
 import DayList from "./DayList";
 import DailySet from "@/components/DailySet";
@@ -16,15 +16,17 @@ interface AppProps {
 
 const STARTING_HEARTS = 3;
 const DAILY_ORB_GOAL = 6;
-const STORAGE_KEY = "daily-orbs-sessions-v1";
+const STORAGE_KEY = "daily-orbs";
 
 const EMPTY_SESSION: GameSession = {
     events: [],
     progress: {},
+    interaction: {},
 };
 
 function createInitialSession(day: DailySetData): GameSession {
     const progress: GameSession["progress"] = {};
+    const interaction: GameSession["interaction"] = {};
 
     for (const orb of day.orbs) {
         progress[orb.id] = {
@@ -33,12 +35,51 @@ function createInitialSession(day: DailySetData): GameSession {
             earnedOrbs: 0,
             completed: false,
         };
+
+        interaction[orb.id] = createInitialInteraction(orb);
     }
 
     return {
         events: [],
         progress,
+        interaction,
     };
+}
+
+function createInitialInteraction(orb: Orb): OrbInteractionState {
+    switch (orb.type) {
+        case "matching":
+            return {
+                type: "matching",
+                selectedPrompt: null,
+                selectedAnswer: null,
+                matched: [],
+                wrongPairs: [],
+                revealed: false,
+                shuffledPrompts: orb.questions
+                    .map((_, index) => index)
+                    .sort(() => Math.random() - 0.5),
+                shuffledAnswers: orb.questions
+                    .map((_, index) => index)
+                    .sort(() => Math.random() - 0.5),
+            };
+
+        case "short-answer":
+            return {
+                type: "short-answer",
+                answers: {},
+                answered: [],
+                wrongAttempts: {},
+                revealed: false,
+            };
+
+        case "categorization":
+            return {
+                type: "categorization",
+                responses: {},
+                revealed: false,
+            };
+    }
 }
 
 // Basic validation before trusting data loaded from localStorage.
@@ -151,18 +192,27 @@ export default function App({ days }: AppProps) {
         }));
     }
 
+    function updateOrbInteraction(
+        orbId: string,
+        state: OrbInteractionState
+    ) {
+        updateSession(previous => ({
+            ...previous,
+            interaction: {
+                ...previous.interaction,
+                [orbId]: state,
+            },
+        }));
+    }
+
     function startDay(day: DailySetData) {
         setSelectedDay(day);
         setSelectedOrbId(null);
 
-        setSessions(previous => {
-            if (previous[day.date]) return previous;
-
-            return {
-                ...previous,
-                [day.date]: createInitialSession(day),
-            };
-        });
+        setSessions(previous => ({
+            ...previous,
+            [day.date]: previous[day.date] ?? createInitialSession(day),
+        }));
     }
 
     function handleCorrectAnswer(orbId: string) {
@@ -335,6 +385,10 @@ export default function App({ days }: AppProps) {
         ? session.progress[selectedOrbId]
         : null;
 
+    const selectedInteraction = selectedOrbId
+        ? session.interaction[selectedOrbId]
+        : null;
+
     const completedDates = days
         .filter(day =>
             day.orbs.length > 0 &&
@@ -359,99 +413,48 @@ export default function App({ days }: AppProps) {
                     />
                 </>
             ) : selectedOrbId === null ? (
-                <>
-                    <button
-                        className="btn btn-ghost mb-4"
-                        onClick={() => setSelectedDay(null)}
-                    >
-                        ← Back to days
-                    </button>
-
-                    <DailySet
-                        day={selectedDay}
-                        progress={session.progress}
-                        onSelectOrb={setSelectedOrbId}
-                    />
-
-                    <div className="mt-8">
-                        <h2 className="font-bold mb-3">
-                            Event history
-                        </h2>
-
-                        {session.events.length === 0 ? (
-                            <p className="text-sm text-base-content/60">
-                                No events yet.
-                            </p>
-                        ) : (
-                            <ol className="flex flex-col gap-2">
-                                {session.events.map((event, index) => {
-                                    const eventOrb = selectedDay.orbs.find(
-                                        orb => orb.id === event.orbId
-                                    );
-
-                                    return (
-                                        <li
-                                            key={`${event.timestamp}-${index}`}
-                                            className="flex items-center justify-between gap-3 text-sm"
-                                        >
-                                            <span>
-                                                {event.type === "orb-earned"
-                                                    ? "Earned an orb"
-                                                    : "Lost a heart"}
-                                                {eventOrb && ` — ${eventOrb.title}`}
-                                            </span>
-
-                                            <span className="text-base-content/50 shrink-0">
-                                                {new Date(
-                                                    event.timestamp
-                                                ).toLocaleTimeString([], {
-                                                    hour: "numeric",
-                                                    minute: "2-digit",
-                                                })}
-                                            </span>
-                                        </li>
-                                    );
-                                })}
-                            </ol>
-                        )}
+                <div className="min-h-[calc(100vh-4rem)] w-full flex flex-col items-center justify-center p-4">
+                    <div className="w-full max-w-2xl">
+                        <DailySet
+                            day={selectedDay}
+                            progress={session.progress}
+                            onSelectOrb={setSelectedOrbId}
+                            onBack={() => setSelectedDay(null)}
+                        />
                     </div>
 
-                    <div className="mt-4 flex justify-center">
+                    <div className="mt-4">
                         <button
                             className="btn btn-outline btn-sm p-2 rounded-lg border border-base-300"
                             onClick={handleShare}
                         >
-                            Share results
+                            Share Results
                         </button>
                     </div>
-                </>
+                </div>
             ) : (
                 <>
                     <button
-                        className="btn btn-ghost mb-4"
+                        className="btn btn-ghost mb-4 p-2 rounded-lg border border-base-300"
                         onClick={() => setSelectedOrbId(null)}
                     >
-                        ← Back to orbs
+                        ← Back to Orbs
                     </button>
 
-                    {selectedOrb && selectedProgress && (
-                        <>
-                            {totalEarnedOrbs >= DAILY_ORB_GOAL && (
-                                <div className="alert alert-success mb-4">
-                                    Daily goal reached! You've earned six orbs.
-                                </div>
-                            )}
-
-                            <OrbRenderer
-                                key={selectedOrb.id}
-                                orb={selectedOrb}
-                                heartsRemaining={selectedProgress.heartsRemaining}
-                                earnedOrbs={selectedProgress.earnedOrbs}
-                                onCorrectAnswer={handleCorrectAnswer}
-                                onIncorrectAnswer={handleIncorrectAnswer}
-                                onComplete={handleComplete}
-                            />
-                        </>
+                    {selectedOrb && selectedProgress && selectedInteraction && (
+                        <OrbRenderer
+                            key={selectedOrb.id}
+                            orb={selectedOrb}
+                            heartsRemaining={selectedProgress.heartsRemaining}
+                            earnedOrbs={selectedProgress.earnedOrbs}
+                            state={selectedInteraction}
+                            onStateChange={state =>
+                                updateOrbInteraction(selectedOrb.id, state)
+                            }
+                            onCorrectAnswer={handleCorrectAnswer}
+                            onIncorrectAnswer={handleIncorrectAnswer}
+                            onComplete={handleComplete}
+                        />
                     )}
                 </>
             )}

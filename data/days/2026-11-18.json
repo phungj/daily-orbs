@@ -7,6 +7,8 @@
       "category": "language",
       "type": "matching",
       "instructions": "Match each person to the event they are associated with.",
+      "promptLabel": "Person",
+      "answerLabel": "Event",
       "questions": [
         {
           "prompt": "Vasily Arkhipov",
@@ -29,6 +31,8 @@
       "category": "science",
       "type": "matching",
       "instructions": "Match the expressions to their origins.",
+      "promptLabel": "Person",
+      "answerLabel": "Event",
       "questions": [
         {
           "prompt": "Vasily Arkhipov",

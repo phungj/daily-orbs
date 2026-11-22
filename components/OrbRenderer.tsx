@@ -1,6 +1,13 @@
 "use client";
 
-import { Orb } from "@/data/days/days";
+import {
+    Orb,
+    OrbInteractionState,
+    MatchingOrbState,
+    ShortAnswerOrbState,
+    CategorizationOrbState,
+} from "@/data/days/days";
+
 import MatchingOrbComponent from "@/components/MatchingOrbComponent";
 import ShortAnswerOrbComponent from "@/components/ShortAnswerOrbComponent";
 import CategorizationOrbComponent from "@/components/CategorizationOrbComponent";
@@ -9,6 +16,8 @@ interface OrbRendererProps {
     orb: Orb;
     heartsRemaining: number;
     earnedOrbs: number;
+    state: OrbInteractionState;
+    onStateChange: (state: OrbInteractionState) => void;
     onCorrectAnswer: (orbId: string) => void;
     onIncorrectAnswer: (orbId: string) => void;
     onComplete: (orbId: string) => void;
@@ -17,13 +26,22 @@ interface OrbRendererProps {
 export default function OrbRenderer(props: OrbRendererProps) {
     switch (props.orb.type) {
         case "matching":
-            return <MatchingOrbComponent {...props} orb={props.orb} />;
+            return (
+                <MatchingOrbComponent
+                    {...props}
+                    orb={props.orb}
+                    state={props.state as MatchingOrbState}
+                    onStateChange={props.onStateChange}
+                />
+            );
 
         case "short-answer":
             return (
                 <ShortAnswerOrbComponent
                     {...props}
                     orb={props.orb}
+                    state={props.state as ShortAnswerOrbState}
+                    onStateChange={props.onStateChange}
                 />
             );
 
@@ -32,6 +50,8 @@ export default function OrbRenderer(props: OrbRendererProps) {
                 <CategorizationOrbComponent
                     {...props}
                     orb={props.orb}
+                    state={props.state as CategorizationOrbState}
+                    onStateChange={props.onStateChange}
                 />
             );
 

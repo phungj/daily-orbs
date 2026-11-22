@@ -10,16 +10,25 @@ interface DailySetProps {
     day: DailySetData;
     progress: Record<string, OrbProgress>;
     onSelectOrb: (orbId: string) => void;
+    onBack: () => void;
 }
 
 export default function DailySet({
                                      day,
                                      progress,
                                      onSelectOrb,
+                                     onBack,
                                  }: DailySetProps) {
     return (
-        <div className="flex flex-col gap-3">
-            <div>
+        <div className="flex flex-col gap-3 w-full">
+            <div className="grid grid-cols-[1fr_auto_1fr] items-center gap-2">
+                <button
+                    className="btn btn-ghost p-2 rounded-lg border border-base-300 justify-self-start"
+                    onClick={onBack}
+                >
+                    ← Back to Days
+                </button>
+
                 <h1 className="text-2xl font-bold text-center">
                     {new Date(day.date + "T12:00:00").toLocaleDateString(
                         undefined,
@@ -30,6 +39,8 @@ export default function DailySet({
                         }
                     )}
                 </h1>
+
+                <div />
             </div>
 
             <div className="grid grid-cols-1 gap-3">

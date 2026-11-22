@@ -34,6 +34,8 @@ export interface MatchingQuestion extends QuestionMedia {
 
 export interface MatchingOrb extends OrbBase {
     type: "matching";
+    promptLabel: string;
+    answerLabel: string;
     questions: MatchingQuestion[];
 }
 
@@ -69,11 +71,6 @@ export interface GameEvent {
     timestamp: number;
 }
 
-export interface GameSession {
-    events: GameEvent[];
-    progress: Record<string, OrbProgress>;
-}
-
 
 export interface CategorizationQuestion extends QuestionMedia {
     category: string;
@@ -85,17 +82,15 @@ export interface CategorizationOrb extends OrbBase {
     questions: CategorizationQuestion[];
 }
 
-export interface MatchingPair {
-    prompt: number;
-    answer: number;
-}
-
 export interface MatchingOrbState {
     type: "matching";
     selectedPrompt: number | null;
     selectedAnswer: number | null;
     matched: number[];
-    wrongPairs: MatchingPair[];
+    wrongPairs: {
+        prompt: number;
+        answer: number;
+    }[];
     revealed: boolean;
     shuffledPrompts: number[];
     shuffledAnswers: number[];
@@ -103,15 +98,29 @@ export interface MatchingOrbState {
 
 export interface ShortAnswerOrbState {
     type: "short-answer";
-    // We'll define these after seeing that component.
+    answers: Record<number, string>;
+    answered: number[];
+    wrongAttempts: Record<number, string[]>;
+    revealed: boolean;
 }
 
 export interface CategorizationOrbState {
     type: "categorization";
-    // We'll define these after seeing that component.
+    responses: Record<number, string>;
+    revealed: boolean;
 }
 
 export type OrbInteractionState =
     | MatchingOrbState
     | ShortAnswerOrbState
     | CategorizationOrbState;
+
+export interface OrbInteraction {
+    [orbId: string]: OrbInteractionState;
+}
+
+export interface GameSession {
+    events: GameEvent[];
+    progress: Record<string, OrbProgress>;
+    interaction: OrbInteraction;
+}

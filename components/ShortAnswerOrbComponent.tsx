@@ -1,15 +1,19 @@
 
 "use client";
 
-import { useState } from "react";
 import Image from "next/image";
-import { ShortAnswerOrb as ShortAnswerOrbData } from "@/data/days/days";
+import {
+    ShortAnswerOrb as ShortAnswerOrbData,
+    ShortAnswerOrbState,
+} from "@/data/days/days";
 import OrbStatus from "@/components/OrbStatus";
 
 interface ShortAnswerOrbProps {
     orb: ShortAnswerOrbData;
     heartsRemaining: number;
     earnedOrbs: number;
+    state: ShortAnswerOrbState;
+    onStateChange: (state: ShortAnswerOrbState) => void;
     onCorrectAnswer: (orbId: string) => void;
     onIncorrectAnswer: (orbId: string) => void;
     onComplete: (orbId: string) => void;
@@ -19,16 +23,25 @@ export default function ShortAnswerOrbComponent({
                                                     orb,
                                                     heartsRemaining,
                                                     earnedOrbs,
+                                                    state,
+                                                    onStateChange,
                                                     onCorrectAnswer,
                                                     onIncorrectAnswer,
                                                     onComplete,
                                                 }: ShortAnswerOrbProps) {
-    const [answers, setAnswers] = useState<Record<number, string>>({});
-    const [answered, setAnswered] = useState<number[]>([]);
-    const [wrongAttempts, setWrongAttempts] = useState<
-        Record<number, string[]>
-    >({});
-    const [revealed, setRevealed] = useState(false);
+    const {
+        answers,
+        answered,
+        wrongAttempts,
+        revealed,
+    } = state;
+
+    function updateState(updates: Partial<ShortAnswerOrbState>) {
+        onStateChange({
+            ...state,
+            ...updates,
+        });
+    }
 
     function submitAnswer(index: number) {
         if (answered.includes(index) || revealed) return;
@@ -38,12 +51,21 @@ export default function ShortAnswerOrbComponent({
 
         const question = orb.questions[index];
         const normalizedGuess = guess.toLowerCase();
-        const normalizedAnswer = (question.answer ?? "").trim().toLowerCase();
+        const normalizedAnswer = question.answer.trim().toLowerCase();
+
+        const updatedAnswers = {
+            ...answers,
+            [index]: "",
+        };
 
         if (normalizedGuess === normalizedAnswer) {
             const newAnswered = [...answered, index];
 
-            setAnswered(newAnswered);
+            updateState({
+                answers: updatedAnswers,
+                answered: newAnswered,
+            });
+
             onCorrectAnswer(orb.id);
 
             if (newAnswered.length === orb.questions.length) {
@@ -53,20 +75,35 @@ export default function ShortAnswerOrbComponent({
             const previousAttempts = wrongAttempts[index] ?? [];
 
             if (!previousAttempts.includes(normalizedGuess)) {
-                setWrongAttempts(previous => ({
-                    ...previous,
-                    [index]: [...(previous[index] ?? []), normalizedGuess],
-                }));
+                updateState({
+                    answers: updatedAnswers,
+                    wrongAttempts: {
+                        ...wrongAttempts,
+                        [index]: [...previousAttempts, normalizedGuess],
+                    },
+                });
 
                 onIncorrectAnswer(orb.id);
             }
         }
     }
 
+    function updateAnswer(index: number, value: string) {
+        updateState({
+            answers: {
+                ...answers,
+                [index]: value,
+            },
+        });
+    }
+
     function revealAnswers() {
         if (complete) return;
 
-        setRevealed(true);
+        updateState({
+            revealed: true,
+        });
+
         onComplete(orb.id);
     }
 
@@ -149,21 +186,11 @@ export default function ShortAnswerOrbComponent({
 
     return (
         <div className="flex flex-col gap-6">
-            <div>
-                <h1 className="text-2xl font-bold">{orb.title}</h1>
-                <p className="text-base-content/70 mt-2">
-                    {orb.instructions}
-                </p>
-            </div>
-
             <div className="flex flex-wrap items-center justify-between gap-4">
-                <div className="flex flex-wrap items-center gap-3">
-                    <p className="text-sm text-base-content/60">
-                        {earnedOrbs} / 3 orbs earned
-                    </p>
-
-                    <p className="text-sm text-base-content/60">
-                        {answered.length + (revealed ? orb.questions.length - answered.length : 0)} / {orb.questions.length} answered
+                <div className="flex-1 min-w-0">
+                    <h1 className="text-2xl font-bold">{orb.title}</h1>
+                    <p className="text-base-content/70 mt-1">
+                        {orb.instructions}
                     </p>
                 </div>
 
@@ -177,7 +204,7 @@ export default function ShortAnswerOrbComponent({
             {remainingQuestions.map(({ question, index }) => (
                 <form
                     key={index}
-                    className="flex flex-col gap-2 p-4"
+                    className="flex flex-col gap-2 py-4"
                     onSubmit={event => {
                         event.preventDefault();
                         submitAnswer(index);
@@ -194,10 +221,7 @@ export default function ShortAnswerOrbComponent({
                                     placeholder="Your answer..."
                                     value={answers[index] ?? ""}
                                     onChange={event =>
-                                        setAnswers(previous => ({
-                                            ...previous,
-                                            [index]: event.target.value,
-                                        }))
+                                        updateAnswer(index, event.target.value)
                                     }
                                 />
                             </div>
@@ -208,9 +232,13 @@ export default function ShortAnswerOrbComponent({
                                         Previously attempted answers:
                                     </p>
                                     <ul className="list-disc list-inside text-base-content/70">
-                                        {wrongAttempts[index].map((answer, attemptIndex) => (
-                                            <li key={attemptIndex}>{answer}</li>
-                                        ))}
+                                        {wrongAttempts[index].map(
+                                            (answer, attemptIndex) => (
+                                                <li key={attemptIndex}>
+                                                    {answer}
+                                                </li>
+                                            )
+                                        )}
                                     </ul>
                                 </div>
                             )}
@@ -242,14 +270,8 @@ export default function ShortAnswerOrbComponent({
                     className="btn btn-outline btn-sm self-center rounded-lg border border-base-300 p-2"
                     onClick={revealAnswers}
                 >
-                    Reveal remaining answers
+                    Reveal Answers
                 </button>
-            )}
-
-            {complete && (
-                <div className="alert alert-success">
-                    All questions answered! Well done.
-                </div>
             )}
         </div>
     );

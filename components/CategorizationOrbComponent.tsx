@@ -1,15 +1,19 @@
 
 "use client";
 
-import { useState } from "react";
 import Image from "next/image";
-import { CategorizationOrb as CategorizationOrbData } from "@/data/days/days";
+import {
+    CategorizationOrb as CategorizationOrbData,
+    CategorizationOrbState,
+} from "@/data/days/days";
 import OrbStatus from "@/components/OrbStatus";
 
 interface CategorizationOrbProps {
     orb: CategorizationOrbData;
     heartsRemaining: number;
     earnedOrbs: number;
+    state: CategorizationOrbState;
+    onStateChange: (state: CategorizationOrbState) => void;
     onCorrectAnswer: (orbId: string) => void;
     onIncorrectAnswer: (orbId: string) => void;
     onComplete: (orbId: string) => void;
@@ -19,12 +23,20 @@ export default function CategorizationOrbComponent({
                                                        orb,
                                                        heartsRemaining,
                                                        earnedOrbs,
+                                                       state,
+                                                       onStateChange,
                                                        onCorrectAnswer,
                                                        onIncorrectAnswer,
                                                        onComplete,
                                                    }: CategorizationOrbProps) {
-    const [responses, setResponses] = useState<Record<number, string>>({});
-    const [revealed, setRevealed] = useState(false);
+    const { responses, revealed } = state;
+
+    function updateState(updates: Partial<CategorizationOrbState>) {
+        onStateChange({
+            ...state,
+            ...updates,
+        });
+    }
 
     function selectCategory(questionIndex: number, category: string) {
         if (responses[questionIndex] !== undefined || revealed) return;
@@ -32,10 +44,14 @@ export default function CategorizationOrbComponent({
         const question = orb.questions[questionIndex];
         const isCorrect = category === question.category;
 
-        setResponses(previous => ({
-            ...previous,
+        const newResponses = {
+            ...responses,
             [questionIndex]: category,
-        }));
+        };
+
+        updateState({
+            responses: newResponses,
+        });
 
         if (isCorrect) {
             onCorrectAnswer(orb.id);
@@ -43,7 +59,7 @@ export default function CategorizationOrbComponent({
             onIncorrectAnswer(orb.id);
         }
 
-        if (Object.keys(responses).length + 1 === orb.questions.length) {
+        if (Object.keys(newResponses).length === orb.questions.length) {
             onComplete(orb.id);
         }
     }
@@ -51,7 +67,10 @@ export default function CategorizationOrbComponent({
     function revealAnswers() {
         if (complete) return;
 
-        setRevealed(true);
+        updateState({
+            revealed: true,
+        });
+
         onComplete(orb.id);
     }
 
@@ -108,21 +127,11 @@ export default function CategorizationOrbComponent({
 
     return (
         <div className="flex flex-col gap-6">
-            <div>
-                <h1 className="text-2xl font-bold">{orb.title}</h1>
-                <p className="text-base-content/70 mt-2">
-                    {orb.instructions}
-                </p>
-            </div>
-
             <div className="flex flex-wrap items-center justify-between gap-4">
-                <div className="flex flex-wrap items-center gap-3">
-                    <p className="text-sm text-base-content/60">
-                        {earnedOrbs} / 3 orbs earned
-                    </p>
-
-                    <p className="text-sm text-base-content/60">
-                        {answeredCount + (revealed ? orb.questions.length - answeredCount : 0)} / {orb.questions.length} answered
+                <div className="flex-1 min-w-0">
+                    <h1 className="text-2xl font-bold">{orb.title}</h1>
+                    <p className="text-base-content/70 mt-1">
+                        {orb.instructions}
                     </p>
                 </div>
 
@@ -161,7 +170,9 @@ export default function CategorizationOrbComponent({
                                                 <button
                                                     key={category}
                                                     className="btn btn-sm p-4 rounded-lg border border-base-300 btn-outline"
-                                                    onClick={() => selectCategory(index, category)}
+                                                    onClick={() =>
+                                                        selectCategory(index, category)
+                                                    }
                                                 >
                                                     <p>{category}</p>
                                                     <p>{remainingCount}</p>
@@ -205,14 +216,8 @@ export default function CategorizationOrbComponent({
                     className="btn btn-outline btn-sm self-center rounded-lg border border-base-300 p-2"
                     onClick={revealAnswers}
                 >
-                    Reveal remaining answers
+                    Reveal Answers
                 </button>
-            )}
-
-            {complete && (
-                <div className="alert alert-success">
-                    All categories completed! Well done.
-                </div>
             )}
         </div>
     );
