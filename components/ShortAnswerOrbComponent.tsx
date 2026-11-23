@@ -13,6 +13,7 @@ interface ShortAnswerOrbProps {
     orb: ShortAnswerOrbData;
     heartsRemaining: number;
     earnedOrbs: number;
+    correctAnswers: number;
     state: ShortAnswerOrbState;
     onStateChange: (state: ShortAnswerOrbState) => void;
     onCorrectAnswer: (orbId: string) => void;
@@ -24,6 +25,7 @@ export default function ShortAnswerOrbComponent({
                                                     orb,
                                                     heartsRemaining,
                                                     earnedOrbs,
+    correctAnswers,
                                                     state,
                                                     onStateChange,
                                                     onCorrectAnswer,
@@ -199,6 +201,8 @@ export default function ShortAnswerOrbComponent({
                     category={orb.category}
                     earnedOrbs={earnedOrbs}
                     heartsRemaining={heartsRemaining}
+                    correctAnswers={correctAnswers}
+                    thresholds={orb.thresholds}
                 />
             </div>
 

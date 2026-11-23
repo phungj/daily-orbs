@@ -66,6 +66,8 @@ export default function DailySet({
                                         category={orb.category}
                                         earnedOrbs={orbProgress?.earnedOrbs ?? 0}
                                         heartsRemaining={orbProgress?.heartsRemaining ?? 3}
+                                        correctAnswers={orbProgress?.correctAnswers ?? 0}
+                                        thresholds={orb.thresholds}
                                     />
                                 </div>
 

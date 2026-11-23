@@ -12,6 +12,7 @@ interface OrbProps {
     orb: FreeResponseOrb;
     heartsRemaining: number;
     earnedOrbs: number;
+    correctAnswers: number;
     state: FreeResponseOrbState;
     onStateChange: (state: FreeResponseOrbState) => void;
     onCorrectAnswer: (orbId: string) => void;
@@ -23,6 +24,7 @@ export default function FreeResponseOrbComponent({
                                                      orb,
                                                      heartsRemaining,
                                                      earnedOrbs,
+                                                     correctAnswers,
                                                      state,
                                                      onStateChange,
                                                      onCorrectAnswer,
@@ -160,6 +162,8 @@ export default function FreeResponseOrbComponent({
                     category={orb.category}
                     earnedOrbs={earnedOrbs}
                     heartsRemaining={heartsRemaining}
+                    correctAnswers={correctAnswers}
+                    thresholds={orb.thresholds}
                 />
             </div>
 

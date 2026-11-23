@@ -17,7 +17,7 @@ export default function DayList({
             {days.map(day => (
                 <button
                     key={day.date}
-                    className="btn btn-outline w-72 grid grid-cols-[1fr_auto_1fr] items-center"
+                    className="btn btn-outline w-72 grid grid-cols-[1fr_auto_1fr] items-center cursor-pointer"
                     onClick={() => onSelectDay(day)}
                 >
                     <span></span>

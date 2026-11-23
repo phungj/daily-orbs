@@ -12,6 +12,7 @@ interface OrbProps {
     orb: MatchingOrb;
     heartsRemaining: number;
     earnedOrbs: number;
+    correctAnswers: number;
     state: MatchingOrbState;
     onStateChange: (state: MatchingOrbState) => void;
     onCorrectAnswer: (orbId: string) => void;
@@ -28,6 +29,7 @@ export default function MatchingOrbComponent({
                                                  orb,
                                                  heartsRemaining,
                                                  earnedOrbs,
+    correctAnswers,
                                                  state,
                                                  onStateChange,
                                                  onCorrectAnswer,
@@ -247,6 +249,8 @@ export default function MatchingOrbComponent({
                     category={orb.category}
                     earnedOrbs={earnedOrbs}
                     heartsRemaining={heartsRemaining}
+                    correctAnswers={correctAnswers}
+                    thresholds={orb.thresholds}
                 />
             </div>
 

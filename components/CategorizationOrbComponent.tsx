@@ -12,6 +12,7 @@ interface CategorizationOrbProps {
     orb: CategorizationOrbData;
     heartsRemaining: number;
     earnedOrbs: number;
+    correctAnswers: number;
     state: CategorizationOrbState;
     onStateChange: (state: CategorizationOrbState) => void;
     onCorrectAnswer: (orbId: string) => void;
@@ -23,6 +24,7 @@ export default function CategorizationOrbComponent({
                                                        orb,
                                                        heartsRemaining,
                                                        earnedOrbs,
+    correctAnswers,
                                                        state,
                                                        onStateChange,
                                                        onCorrectAnswer,
@@ -139,6 +141,8 @@ export default function CategorizationOrbComponent({
                     category={orb.category}
                     earnedOrbs={earnedOrbs}
                     heartsRemaining={heartsRemaining}
+                    correctAnswers={correctAnswers}
+                    thresholds={orb.thresholds}
                 />
             </div>
 

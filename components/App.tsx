@@ -456,6 +456,7 @@ export default function App({ days }: AppProps) {
                             key={selectedOrb.id}
                             orb={selectedOrb}
                             heartsRemaining={selectedProgress.heartsRemaining}
+                            correctAnswers={selectedProgress.correctAnswers}
                             earnedOrbs={selectedProgress.earnedOrbs}
                             state={selectedInteraction}
                             onStateChange={state =>

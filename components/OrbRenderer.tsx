@@ -17,6 +17,7 @@ interface OrbRendererProps {
     orb: Orb;
     heartsRemaining: number;
     earnedOrbs: number;
+    correctAnswers: number;
     state: OrbInteractionState;
     onStateChange: (state: OrbInteractionState) => void;
     onCorrectAnswer: (orbId: string) => void;
