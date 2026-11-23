@@ -192,7 +192,7 @@ export default function MatchingOrbComponent({
 
         return (
             <div className="flex flex-col items-center gap-2">
-                {question.answer && <span>{question.answer}</span>}
+                {question.answer && <span>{question.answer.text}</span>}
 
                 {question.answerImage && (
                     <Image

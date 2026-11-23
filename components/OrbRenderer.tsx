@@ -5,12 +5,13 @@ import {
     OrbInteractionState,
     MatchingOrbState,
     ShortAnswerOrbState,
-    CategorizationOrbState,
+    CategorizationOrbState, FreeResponseOrbState,
 } from "@/data/days/days";
 
 import MatchingOrbComponent from "@/components/MatchingOrbComponent";
 import ShortAnswerOrbComponent from "@/components/ShortAnswerOrbComponent";
 import CategorizationOrbComponent from "@/components/CategorizationOrbComponent";
+import FreeResponseOrbComponent from "@/components/FreeResponseOrbComponent";
 
 interface OrbRendererProps {
     orb: Orb;
@@ -55,6 +56,15 @@ export default function OrbRenderer(props: OrbRendererProps) {
                 />
             );
 
+        case "free-response":
+            return (
+                <FreeResponseOrbComponent
+                    {...props}
+                    orb={props.orb}
+                    state={props.state as FreeResponseOrbState}
+                    onStateChange={props.onStateChange}
+                />
+            );
         default:
             return null;
     }

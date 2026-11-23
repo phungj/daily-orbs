@@ -23,7 +23,7 @@ export interface QuestionMedia {
     prompt?: string;
     promptImage?: QuestionImage;
 
-    answer?: string;
+    answer?: AcceptedAnswer;
     answerImage?: QuestionImage;
 
     explanation?: string;
@@ -42,7 +42,7 @@ export interface MatchingOrb extends OrbBase {
 }
 
 export interface ShortAnswerQuestion extends QuestionMedia {
-    answer: string
+    answer: AcceptedAnswer;
 }
 
 export interface ShortAnswerOrb extends OrbBase {
@@ -53,7 +53,8 @@ export interface ShortAnswerOrb extends OrbBase {
 export type Orb =
     | MatchingOrb
     | ShortAnswerOrb
-    | CategorizationOrb;
+    | CategorizationOrb
+    | FreeResponseOrb;
 
 export interface DailySet {
     date: string;
@@ -115,7 +116,8 @@ export interface CategorizationOrbState {
 export type OrbInteractionState =
     | MatchingOrbState
     | ShortAnswerOrbState
-    | CategorizationOrbState;
+    | CategorizationOrbState
+    | FreeResponseOrbState;
 
 export interface OrbInteraction {
     [orbId: string]: OrbInteractionState;
@@ -125,4 +127,25 @@ export interface GameSession {
     events: GameEvent[];
     progress: Record<string, OrbProgress>;
     interaction: OrbInteraction;
+}
+
+export interface FreeResponseOrb extends OrbBase {
+    type: "free-response";
+    prompt: string;
+    answers: AcceptedAnswer[];
+    safeAnswers?: AcceptedAnswer[];
+}
+
+export interface FreeResponseOrbState {
+    type: "free-response";
+    answer: string;
+    foundAnswers: string[];
+    foundSafeAnswers: string[];
+    wrongAttempts: string[];
+    revealed: boolean;
+}
+
+export interface AcceptedAnswer {
+    text: string;
+    aliases?: string[];
 }

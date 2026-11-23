@@ -7,6 +7,7 @@ import {
     ShortAnswerOrbState,
 } from "@/data/days/days";
 import OrbStatus from "@/components/OrbStatus";
+import {matchesAnswer, normalizeAnswer} from "@/data/answerUtils";
 
 interface ShortAnswerOrbProps {
     orb: ShortAnswerOrbData;
@@ -50,15 +51,15 @@ export default function ShortAnswerOrbComponent({
         if (!guess) return;
 
         const question = orb.questions[index];
-        const normalizedGuess = guess.toLowerCase();
-        const normalizedAnswer = question.answer.trim().toLowerCase();
+
+        const normalizedGuess = normalizeAnswer(guess);
 
         const updatedAnswers = {
             ...answers,
             [index]: "",
         };
 
-        if (normalizedGuess === normalizedAnswer) {
+        if (matchesAnswer(guess, question.answer)) {
             const newAnswered = [...answered, index];
 
             updateState({
@@ -142,7 +143,7 @@ export default function ShortAnswerOrbComponent({
         return (
             <div className="flex flex-col gap-2">
                 {question.answer && (
-                    <p className="text-success">{question.answer}</p>
+                    <p className="text-success">{question.answer.text}</p>
                 )}
 
                 {question.answerImage && (

@@ -79,6 +79,16 @@ function createInitialInteraction(orb: Orb): OrbInteractionState {
                 responses: {},
                 revealed: false,
             };
+
+        case "free-response":
+            return {
+                type: "free-response",
+                answer: "",
+                foundAnswers: [],
+                foundSafeAnswers: [],
+                wrongAttempts: [],
+                revealed: false,
+            };
     }
 }
 
@@ -365,7 +375,7 @@ export default function App({ days }: AppProps) {
             }
         }
 
-        const shareText = `DailyOrbs ${date}\n${result.join("")}`;
+        const shareText = `Jon's DailyOrbs ${date}\n${result.join("")}`;
 
         await navigator.clipboard.writeText(shareText);
 
