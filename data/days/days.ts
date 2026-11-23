@@ -1,3 +1,5 @@
+import {StaticImageData} from "next/image";
+
 export type OrbCategory =
     | "language"
     | "science"
@@ -13,7 +15,7 @@ export interface OrbBase {
 }
 
 export interface QuestionImage {
-    src: string;
+    src: StaticImageData;
     alt: string;
 }
 

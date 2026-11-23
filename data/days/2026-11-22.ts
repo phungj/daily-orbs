@@ -1,5 +1,18 @@
+import type {DailySet} from "@/data/days/days";
 
-{
+import theScream from "../../public/images/2026-11-22/the-scream.jpg";
+import theStarryNight from "../../public/images/2026-11-22/the-starry-night.jpg";
+import thePersistenceOfMemory from "../../public/images/2026-11-22/the-persistence-of-memory.jpg";
+import girlWithPearlEarring from "../../public/images/2026-11-22/girl-with-a-pearl-earring.jpg";
+import comedian from "../../public/images/2026-11-22/comedian.jpg";
+import fountain from "../../public/images/2026-11-22/fountain.jpg";
+import guernica from "../../public/images/2026-11-22/guernica.jpg";
+import campbellsSoupCans from "../../public/images/2026-11-22/campbells-soup-cans.jpg";
+import theGreatWave from "../../public/images/2026-11-22/the-great-wave-off-kanagawa.jpg";
+import theTreacheryOfImages from "../../public/images/2026-11-22/the-treachery-of-images.jpg";
+
+
+const day: DailySet = {
   "date": "2026-11-22",
   "orbs": [
     {
@@ -181,86 +194,88 @@
       ]
     },
     {
-      "id": "famous-artworks",
-      "title": "Art History",
-      "category": "pop-culture",
-      "type": "matching",
-      "instructions": "Match each famous artwork to its title.",
-      "promptLabel": "Title",
-      "answerLabel": "Artwork",
-      "thresholds": [2, 5, 9],
-      "questions": [
+      id: "famous-artworks",
+      title: "Art History",
+      category: "pop-culture",
+      type: "matching",
+      instructions: "Match each famous artwork to its title.",
+      promptLabel: "Title",
+      answerLabel: "Artwork",
+      thresholds: [2, 5, 9],
+      questions: [
         {
-          "prompt": "The Scream",
-          "answerImage": {
-            "src": "/images/2026-11-22/the-scream.jpg",
-            "alt": ""
+          prompt: "The Scream",
+          answerImage: {
+            src: theScream,
+            alt: "The Scream"
           }
         },
         {
-          "prompt": "The Starry Night",
-          "answerImage": {
-            "src": "/images/2026-11-22/the-starry-night.jpg",
-            "alt": ""
+          prompt: "The Starry Night",
+          answerImage: {
+            src: theStarryNight,
+            alt: "The Starry Night"
           }
         },
         {
-          "prompt": "The Persistence of Memory",
-          "answerImage": {
-            "src": "/images/2026-11-22/the-persistence-of-memory.jpg",
-            "alt": ""
+          prompt: "The Persistence of Memory",
+          answerImage: {
+            src: thePersistenceOfMemory,
+            alt: "The Persistence of Memory"
           }
         },
         {
-          "prompt": "Girl with a Pearl Earring",
-          "answerImage": {
-            "src": "/images/2026-11-22/girl-with-a-pearl-earring.jpg",
-            "alt": ""
+          prompt: "Girl with a Pearl Earring",
+          answerImage: {
+            src: girlWithPearlEarring,
+            alt: "Girl with a Pearl Earring"
           }
         },
         {
-          "prompt": "Comedian",
-          "answerImage": {
-            "src": "/images/2026-11-22/comedian.jpg",
-            "alt": ""
+          prompt: "Comedian",
+          answerImage: {
+            src: comedian,
+            alt: "Comedian"
           }
         },
         {
-          "prompt": "Fountain",
-          "answerImage": {
-            "src": "/images/2026-11-22/fountain.jpg",
-            "alt": ""
+          prompt: "Fountain",
+          answerImage: {
+            src: fountain,
+            alt: "Fountain"
           }
         },
         {
-          "prompt": "Guernica",
-          "answerImage": {
-            "src": "/images/2026-11-22/guernica.jpg",
-            "alt": ""
+          prompt: "Guernica",
+          answerImage: {
+            src: guernica,
+            alt: "Guernica"
           }
         },
         {
-          "prompt": "Campbell's Soup Cans",
-          "answerImage": {
-            "src": "/images/2026-11-22/campbells-soup-cans.jpg",
-            "alt": ""
+          prompt: "Campbell's Soup Cans",
+          answerImage: {
+            src: campbellsSoupCans,
+            alt: "Campbell's Soup Cans"
           }
         },
         {
-          "prompt": "The Great Wave off Kanagawa",
-          "answerImage": {
-            "src": "/images/2026-11-22/the-great-wave-off-kanagawa.jpg",
-            "alt": ""
+          prompt: "The Great Wave off Kanagawa",
+          answerImage: {
+            src: theGreatWave,
+            alt: "The Great Wave off Kanagawa"
           }
         },
         {
-          "prompt": "The Treachery of Images",
-          "answerImage": {
-            "src": "/images/2026-11-22/the-treachery-of-images.jpg",
-            "alt": ""
+          prompt: "The Treachery of Images",
+          answerImage: {
+            src: theTreacheryOfImages,
+            alt: "The Treachery of Images"
           }
         }
       ]
     }
   ]
 }
+
+export default day;
