@@ -82,45 +82,45 @@ function createInitialInteraction(orb: Orb): OrbInteractionState {
     }
 }
 
-// Basic validation before trusting data loaded from localStorage.
+function isRecord(value: unknown): value is Record<string, unknown> {
+    return (
+        typeof value === "object" &&
+        value !== null &&
+        !Array.isArray(value)
+    );
+}
+
 function isStoredSessions(
     value: unknown
 ): value is Record<string, GameSession> {
-    if (
-        typeof value !== "object" ||
-        value === null ||
-        Array.isArray(value)
-    ) {
+    if (!isRecord(value)) {
         return false;
     }
 
-    return Object.values(value).every(session => {
+    return Object.values(value).every((session: unknown) => {
         if (
-            typeof session !== "object" ||
-            session === null ||
+            !isRecord(session) ||
             !Array.isArray(session.events) ||
-            typeof session.progress !== "object" ||
-            session.progress === null ||
-            Array.isArray(session.progress)
+            !isRecord(session.progress) ||
+            !isRecord(session.interaction)
         ) {
             return false;
         }
 
-        const validEvents = session.events.every(event =>
-            event !== null &&
-            typeof event === "object" &&
+        const validEvents = session.events.every((event: unknown) =>
+            isRecord(event) &&
             (event.type === "orb-earned" || event.type === "heart-lost") &&
             typeof event.orbId === "string" &&
             typeof event.timestamp === "number"
         );
 
-        const validProgress = Object.values(session.progress).every(progress =>
-            progress !== null &&
-            typeof progress === "object" &&
-            typeof progress.correctAnswers === "number" &&
-            typeof progress.heartsRemaining === "number" &&
-            typeof progress.earnedOrbs === "number" &&
-            typeof progress.completed === "boolean"
+        const validProgress = Object.values(session.progress).every(
+            (progress: unknown) =>
+                isRecord(progress) &&
+                typeof progress.correctAnswers === "number" &&
+                typeof progress.heartsRemaining === "number" &&
+                typeof progress.earnedOrbs === "number" &&
+                typeof progress.completed === "boolean"
         );
 
         return validEvents && validProgress;
