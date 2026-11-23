@@ -7,6 +7,7 @@ import {
     CategorizationOrbState,
 } from "@/data/days/days";
 import OrbStatus from "@/components/OrbStatus";
+import { orbStyles } from "@/components/orbStyles";
 
 interface CategorizationOrbProps {
     orb: CategorizationOrbData;
@@ -24,7 +25,7 @@ export default function CategorizationOrbComponent({
                                                        orb,
                                                        heartsRemaining,
                                                        earnedOrbs,
-    correctAnswers,
+                                                       correctAnswers,
                                                        state,
                                                        onStateChange,
                                                        onCorrectAnswer,
@@ -32,6 +33,8 @@ export default function CategorizationOrbComponent({
                                                        onComplete,
                                                    }: CategorizationOrbProps) {
     const { responses, revealed } = state;
+
+    const categoryColor = orbStyles[orb.category].color;
 
     function updateState(updates: Partial<CategorizationOrbState>) {
         onStateChange({
@@ -79,13 +82,15 @@ export default function CategorizationOrbComponent({
     const answeredCount = Object.keys(responses).length;
     const complete = revealed || answeredCount === orb.questions.length;
 
-    function renderPrompt(index: number) {
+    function renderPrompt(index: number, incorrect = false) {
         const question = orb.questions[index];
 
         return (
             <div className="flex flex-col gap-2 flex-1">
                 {question.prompt && (
-                    <p className="font-semibold">{question.prompt}</p>
+                    <p className={`font-semibold ${incorrect ? "line-through" : ""}`}>
+                        {question.prompt}
+                    </p>
                 )}
 
                 {question.promptImage && (
@@ -152,6 +157,7 @@ export default function CategorizationOrbComponent({
                     const answered = response !== undefined;
                     const wasRevealed = revealed && !answered;
                     const correct = response === question.category;
+                    const incorrect = answered && !correct;
 
                     return (
                         <div
@@ -159,7 +165,7 @@ export default function CategorizationOrbComponent({
                             className="flex flex-col gap-2 py-3"
                         >
                             <div className="flex flex-col sm:flex-row sm:items-center gap-3">
-                                {renderPrompt(index)}
+                                {renderPrompt(index, incorrect)}
 
                                 {!answered && !revealed && (
                                     <div className="flex flex-wrap gap-2 sm:justify-end">
@@ -185,6 +191,17 @@ export default function CategorizationOrbComponent({
                                         })}
                                     </div>
                                 )}
+
+                                {incorrect && (
+                                    <div className="flex justify-center sm:justify-end sm:min-w-16">
+                                        <span
+                                            className={`text-2xl ${categoryColor}`}
+                                            aria-label="Incorrect answer"
+                                        >
+                                            💔
+                                        </span>
+                                    </div>
+                                )}
                             </div>
 
                             {answered && (
@@ -192,9 +209,7 @@ export default function CategorizationOrbComponent({
                                     correct ? "text-success" : "text-error"
                                 }`}>
                                     <p className="font-semibold">
-                                        {correct
-                                            ? "Correct! The answer is " + question.category + "."
-                                            : "Incorrect. The answer is " + question.category + "."}
+                                        {"The answer is " + question.category + "."}
                                     </p>
 
                                     {renderExplanation(index)}

@@ -7,7 +7,8 @@ import {
     ShortAnswerOrbState,
 } from "@/data/days/days";
 import OrbStatus from "@/components/OrbStatus";
-import {matchesAnswer, normalizeAnswer} from "@/data/answerUtils";
+import { orbStyles } from "@/components/orbStyles";
+import { matchesAnswer, normalizeAnswer } from "@/data/answerUtils";
 
 interface ShortAnswerOrbProps {
     orb: ShortAnswerOrbData;
@@ -25,7 +26,7 @@ export default function ShortAnswerOrbComponent({
                                                     orb,
                                                     heartsRemaining,
                                                     earnedOrbs,
-    correctAnswers,
+                                                    correctAnswers,
                                                     state,
                                                     onStateChange,
                                                     onCorrectAnswer,
@@ -38,6 +39,8 @@ export default function ShortAnswerOrbComponent({
         wrongAttempts,
         revealed,
     } = state;
+
+    const categoryColor = orbStyles[orb.category].color;
 
     function updateState(updates: Partial<ShortAnswerOrbState>) {
         onStateChange({
@@ -53,7 +56,6 @@ export default function ShortAnswerOrbComponent({
         if (!guess) return;
 
         const question = orb.questions[index];
-
         const normalizedGuess = normalizeAnswer(guess);
 
         const updatedAnswers = {
@@ -206,58 +208,73 @@ export default function ShortAnswerOrbComponent({
                 />
             </div>
 
-            {remainingQuestions.map(({ question, index }) => (
-                <form
-                    key={index}
-                    className="flex flex-col gap-2 py-4"
-                    onSubmit={event => {
-                        event.preventDefault();
-                        submitAnswer(index);
-                    }}
-                >
-                    {renderPrompt(index)}
+            {remainingQuestions.map(({ question, index }) => {
+                const attempts = wrongAttempts[index] ?? [];
 
-                    {!revealed && (
-                        <>
-                            <div className="flex flex-col sm:flex-row gap-2">
-                                <input
-                                    type="text"
-                                    className="input input-bordered flex-1"
-                                    placeholder="Your answer..."
-                                    value={answers[index] ?? ""}
-                                    onChange={event =>
-                                        updateAnswer(index, event.target.value)
-                                    }
-                                />
-                            </div>
+                return (
+                    <form
+                        key={index}
+                        className="flex flex-col gap-2 py-4"
+                        onSubmit={event => {
+                            event.preventDefault();
+                            submitAnswer(index);
+                        }}
+                    >
+                        {renderPrompt(index)}
 
-                            {(wrongAttempts[index]?.length ?? 0) > 0 && (
-                                <div className="text-sm">
-                                    <p className="text-error font-semibold">
-                                        Previously attempted answers:
-                                    </p>
-                                    <ul className="list-disc list-inside text-base-content/70">
-                                        {wrongAttempts[index].map(
-                                            (answer, attemptIndex) => (
-                                                <li key={attemptIndex}>
+                        {!revealed && (
+                            <>
+                                <div className="flex flex-col sm:flex-row gap-2">
+                                    <input
+                                        type="text"
+                                        className="input input-bordered flex-1"
+                                        placeholder="Your answer..."
+                                        value={answers[index] ?? ""}
+                                        onChange={event =>
+                                            updateAnswer(index, event.target.value)
+                                        }
+                                    />
+                                </div>
+
+                                {attempts.length > 0 && (
+                                    <div className="text-sm">
+                                        <p className="text-error font-semibold">
+                                            Previously attempted answers:
+                                        </p>
+
+                                        <ul className="list-disc list-inside text-base-content/70">
+                                            {attempts.map((answer, attemptIndex) => (
+                                                <li
+                                                    key={attemptIndex}
+                                                    className="line-through"
+                                                >
                                                     {answer}
                                                 </li>
-                                            )
-                                        )}
-                                    </ul>
-                                </div>
-                            )}
-                        </>
-                    )}
+                                            ))}
+                                        </ul>
+                                    </div>
+                                )}
+                            </>
+                        )}
 
-                    {revealed && (
-                        <div className="flex flex-col gap-2">
-                            {renderAnswer(index)}
-                            {renderExplanation(index)}
-                        </div>
-                    )}
-                </form>
-            ))}
+                        {revealed && (
+                            <div className="flex flex-col gap-2">
+                                {renderAnswer(index)}
+                                {renderExplanation(index)}
+                            </div>
+                        )}
+
+                        {attempts.length > 0 && (
+                            <span
+                                className={`text-2xl self-end ${categoryColor}`}
+                                aria-label="Incorrect answer"
+                            >
+                                💔
+                            </span>
+                        )}
+                    </form>
+                );
+            })}
 
             {answered.map(index => (
                 <div

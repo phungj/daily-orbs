@@ -7,6 +7,7 @@ import {
     MatchingOrbState,
 } from "@/data/days/days";
 import OrbStatus from "@/components/OrbStatus";
+import { orbStyles } from "@/components/orbStyles";
 
 interface OrbProps {
     orb: MatchingOrb;
@@ -29,7 +30,7 @@ export default function MatchingOrbComponent({
                                                  orb,
                                                  heartsRemaining,
                                                  earnedOrbs,
-    correctAnswers,
+                                                 correctAnswers,
                                                  state,
                                                  onStateChange,
                                                  onCorrectAnswer,
@@ -47,6 +48,7 @@ export default function MatchingOrbComponent({
     } = state;
 
     const complete = matched.length === orb.questions.length;
+    const categoryColor = orbStyles[orb.category].color;
 
     function updateState(updates: Partial<MatchingOrbState>) {
         onStateChange({
@@ -168,12 +170,16 @@ export default function MatchingOrbComponent({
         index => !matched.includes(index)
     );
 
-    function renderPrompt(index: number) {
+    function renderPrompt(index: number, incorrect = false) {
         const question = orb.questions[index];
 
         return (
             <div className="flex flex-col items-center gap-2">
-                {question.prompt && <span>{question.prompt}</span>}
+                {question.prompt && (
+                    <span className={incorrect ? "line-through" : ""}>
+                        {question.prompt}
+                    </span>
+                )}
 
                 {question.promptImage && (
                     <Image
@@ -189,12 +195,16 @@ export default function MatchingOrbComponent({
         );
     }
 
-    function renderAnswer(index: number) {
+    function renderAnswer(index: number, incorrect = false) {
         const question = orb.questions[index];
 
         return (
             <div className="flex flex-col items-center gap-2">
-                {question.answer && <span>{question.answer.text}</span>}
+                {question.answer && (
+                    <span className={incorrect ? "line-through" : ""}>
+                        {question.answer.text}
+                    </span>
+                )}
 
                 {question.answerImage && (
                     <Image
@@ -325,7 +335,7 @@ export default function MatchingOrbComponent({
                     className="flex flex-col sm:flex-row gap-2 items-stretch sm:items-center"
                 >
                     <div className="flex-1 rounded-lg bg-error/10 border border-error/40 p-3">
-                        {renderPrompt(pair.prompt)}
+                        {renderPrompt(pair.prompt, true)}
                     </div>
 
                     <div className="hidden sm:block text-error font-bold">
@@ -333,8 +343,15 @@ export default function MatchingOrbComponent({
                     </div>
 
                     <div className="flex-1 rounded-lg bg-error/10 border border-error/40 p-3">
-                        {renderAnswer(pair.answer)}
+                        {renderAnswer(pair.answer, true)}
                     </div>
+
+                    <span
+                        className={`text-2xl self-center ${categoryColor}`}
+                        aria-label="Incorrect answer"
+                    >
+                        💔
+                    </span>
                 </div>
             ))}
 

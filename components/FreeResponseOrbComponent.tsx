@@ -6,7 +6,8 @@ import {
     FreeResponseOrbState,
 } from "@/data/days/days";
 import OrbStatus from "@/components/OrbStatus";
-import {matchesAnswer, normalizeAnswer} from "@/data/answerUtils";
+import { orbStyles } from "@/components/orbStyles";
+import { matchesAnswer, normalizeAnswer } from "@/data/answerUtils";
 
 interface OrbProps {
     orb: FreeResponseOrb;
@@ -41,6 +42,7 @@ export default function FreeResponseOrbComponent({
 
     const safeAnswers = orb.safeAnswers ?? [];
     const complete = foundAnswers.length === orb.answers.length;
+    const categoryColor = orbStyles[orb.category].color;
 
     function updateState(updates: Partial<FreeResponseOrbState>) {
         onStateChange({
@@ -67,7 +69,9 @@ export default function FreeResponseOrbComponent({
 
         if (correctAnswer) {
             const alreadyFound = foundAnswers.some(
-                item => normalizeAnswer(item) === normalizeAnswer(correctAnswer.text)
+                item =>
+                    normalizeAnswer(item) ===
+                    normalizeAnswer(correctAnswer.text)
             );
 
             if (alreadyFound) {
@@ -93,7 +97,9 @@ export default function FreeResponseOrbComponent({
 
         if (safeAnswer) {
             const alreadyFound = foundSafeAnswers.some(
-                item => normalizeAnswer(item) === normalizeAnswer(safeAnswer.text)
+                item =>
+                    normalizeAnswer(item) ===
+                    normalizeAnswer(safeAnswer.text)
             );
 
             if (alreadyFound) {
@@ -256,9 +262,18 @@ export default function FreeResponseOrbComponent({
                     {wrongAttempts.map((item, index) => (
                         <div
                             key={`${item}-${index}`}
-                            className="rounded-lg bg-error/10 border border-error/40 p-3"
+                            className="rounded-lg bg-error/10 border border-error/40 p-3 flex items-center gap-3"
                         >
-                            {item}
+                            <span className="line-through flex-1">
+                                {item}
+                            </span>
+
+                            <span
+                                className={`text-2xl ${categoryColor}`}
+                                aria-label="Incorrect answer"
+                            >
+                                💔
+                            </span>
                         </div>
                     ))}
                 </div>
