@@ -88,7 +88,7 @@ const day: DailySet = {
       ]
     },
     {
-      id: "i-like-your-funny-words-magic-man-3",
+      id: "i-like-your-funny-words-magic-man-iii",
       title: "I Like Your Funny Words Magic Man",
       category: "science",
       type: "matching",

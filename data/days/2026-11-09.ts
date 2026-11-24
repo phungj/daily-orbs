@@ -140,7 +140,7 @@ const day: DailySet = {
             type: "free-response",
             instructions: "Identify the countries that are the world's top coffee producers. Top 20 don't cost a heart. Data taken from the 2026 USDA.",
             prompt: "",
-            thresholds: [3, 7, 12],
+            thresholds: [2, 5, 9],
             answers: [
                 {
                     text: "Brazil",
