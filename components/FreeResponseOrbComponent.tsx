@@ -238,12 +238,18 @@ export default function FreeResponseOrbComponent({
                                 {index + 1}.
                             </span>
 
-                            <span className={found ? "text-success" : ""}>
-                                {showAnswer ? item.text : ""}
-                            </span>
+                            <div className="flex-1 min-w-0">
+                                {showAnswer && (
+                                    <span className={found ? "text-success" : ""}>
+                                            {item.text}
+                                        </span>
+                                )}
+                            </div>
 
-                            {found && (
-                                <span className="ml-auto text-success">✓</span>
+                            {found && item.explanation && (
+                                <span className="text-sm text-base-content/70">
+        {item.explanation}
+    </span>
                             )}
                         </div>
                     );
@@ -263,7 +269,16 @@ export default function FreeResponseOrbComponent({
                                 <span className="font-bold text-base-content/60 w-6 text-right">
                                     {orb.answers.length + index + 1}.
                                 </span>
-                                {item.text}
+
+                                <div className="flex-1 min-w-0">
+                                    <span>{item.text}</span>
+
+                                    {item.explanation && (
+                                        <p className="text-sm text-base-content/70 mt-1">
+                                            {item.explanation}
+                                        </p>
+                                    )}
+                                </div>
                             </div>
                         );
                     })}

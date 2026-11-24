@@ -149,4 +149,5 @@ export interface FreeResponseOrbState {
 export interface AcceptedAnswer {
     text: string;
     aliases?: string[];
+    explanation?: string;
 }

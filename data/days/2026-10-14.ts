@@ -155,7 +155,7 @@ const day: DailySet = {
             category: "geography",
             type: "free-response",
             instructions: "List the countries that share a land or maritime border with Vietnam.",
-            prompt: "Name the neighboring countries.",
+            prompt: "",
             thresholds: [2, 4, 6],
             referenceImages: [
                 {
@@ -175,10 +175,10 @@ const day: DailySet = {
         },
         {
             id: "i-hear-the-blues-a-callin",
-            title: "I Hear the Blues a Callin",
+            title: "I Hear the Blues a-Callin'",
             category: "pop-culture",
             type: "categorization",
-            instructions: "Classify each dish as either a type of salad or a type of omelette or egg dish.",
+            instructions: "Classify each dish as either a type of salad or a type of omelette/egg dish.",
             thresholds: [3, 6, 10],
             categories: [
                 "Salad",

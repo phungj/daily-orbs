@@ -99,7 +99,7 @@ const day: DailySet = {
             category: "geography",
             type: "free-response",
             instructions: "Name the countries and political entities represented among the belligerents in the Vietnam War.",
-            prompt: "Name the participating entities.",
+            prompt: "",
             thresholds: [3, 7, 12],
             answers: [
                 { text: "South Vietnam" },
