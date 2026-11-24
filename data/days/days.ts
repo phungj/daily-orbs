@@ -12,6 +12,7 @@ export interface OrbBase {
     category: OrbCategory;
     instructions: string;
     thresholds: number[];
+    referenceImages?: QuestionImage[];
 }
 
 export interface QuestionImage {

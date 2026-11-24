@@ -1,6 +1,7 @@
 
 "use client";
 
+import Image from "next/image";
 import {
     FreeResponseOrb,
     FreeResponseOrbState,
@@ -173,6 +174,20 @@ export default function FreeResponseOrbComponent({
                 />
             </div>
 
+            {orb.referenceImages && orb.referenceImages.length > 0 && (
+                <div className="flex flex-col items-center gap-3">
+                    {orb.referenceImages.map((image, index) => (
+                        <Image
+                            key={index}
+                            src={image.src}
+                            alt={image.alt}
+                            className="max-w-full max-h-[360px] w-auto h-auto object-contain rounded-lg"
+                            sizes="(max-width: 768px) 100vw, 700px"
+                        />
+                    ))}
+                </div>
+            )}
+
             <div className="rounded-lg bg-base-200 py-4 flex flex-col gap-3">
                 {!revealed && !complete && (
                     <form
@@ -204,9 +219,7 @@ export default function FreeResponseOrbComponent({
             </div>
 
             <div className="flex flex-col gap-2">
-                <h2 className="font-bold">
-                    Answers
-                </h2>
+                <h2 className="font-bold">Answers</h2>
 
                 {orb.answers.map((item, index) => {
                     const found = isFound(item.text);

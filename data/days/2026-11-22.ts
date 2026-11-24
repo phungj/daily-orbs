@@ -165,7 +165,7 @@ const day: DailySet = {
       category: "geography",
       type: "categorization",
       instructions: "Classify each city according to whether it is located in Russia.",
-      thresholds: [3, 7, 11],
+      thresholds: [3, 6, 10],
       categories: [
         "Russian",
         "Not Russian"

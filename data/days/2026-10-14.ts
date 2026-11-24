@@ -10,6 +10,7 @@ import berettaM9 from "../../public/images/2026-10-14/beretta-m9.jpg";
 import nagantM1895 from "../../public/images/2026-10-14/nagant-m1895.jpg";
 import nambu from "../../public/images/2026-10-14/nambu.jpg";
 import smithWessonModel500 from "../../public/images/2026-10-14/smith-wesson-model-500.jpg";
+import vietnamMap from "../../public/images/2026-10-14/vietnam-map.jpg";
 
 const day: DailySet = {
     date: "2026-10-14",
@@ -156,6 +157,12 @@ const day: DailySet = {
             instructions: "List the countries that share a land or maritime border with Vietnam.",
             prompt: "Name the neighboring countries.",
             thresholds: [2, 4, 6],
+            referenceImages: [
+                {
+                    src: vietnamMap,
+                    alt: "Map of Southeast Asia showing Vietnam and its neighboring countries",
+                },
+            ],
             answers: [
                 { text: "China", aliases: ["People's Republic of China", "PRC"] },
                 { text: "Laos", aliases: ["Lao PDR"] },
@@ -172,7 +179,7 @@ const day: DailySet = {
             category: "pop-culture",
             type: "categorization",
             instructions: "Classify each dish as either a type of salad or a type of omelette or egg dish.",
-            thresholds: [3, 7, 11],
+            thresholds: [3, 6, 10],
             categories: [
                 "Salad",
                 "Omelette / Egg Dish"
