@@ -205,7 +205,7 @@ export default function CategorizationOrbComponent({
                             </div>
 
                             {answered && (
-                                <div className={`text-sm pl-1 ${
+                                <div className={`text-sm ${
                                     correct ? "text-success" : "text-error"
                                 }`}>
                                     <p className="font-semibold">
@@ -217,7 +217,7 @@ export default function CategorizationOrbComponent({
                             )}
 
                             {wasRevealed && (
-                                <div className="text-sm pl-1">
+                                <div className="text-sm">
                                     <p className="font-semibold">
                                         Answer: {question.category}.
                                     </p>

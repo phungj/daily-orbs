@@ -16,7 +16,7 @@ const day: DailySet = {
     date: "2026-10-27",
     orbs: [
         {
-            id: "lost-in-translation",
+            id: "lost-in-translation-i",
             title: "Lost in Translation",
             category: "language",
             type: "matching",

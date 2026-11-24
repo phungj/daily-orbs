@@ -80,6 +80,11 @@ export default function OrbStatus({
                                   }: OrbStatusProps) {
     const style = orbStyles[category];
 
+    const effectiveCorrectAnswers =
+        heartsRemaining === 0
+            ? (earnedOrbs > 0 ? thresholds[earnedOrbs - 1] : 0)
+            : correctAnswers;
+
     return (
         <div className="flex flex-col items-end gap-1 shrink-0">
             {/* Orbs */}
@@ -99,7 +104,7 @@ export default function OrbStatus({
                     const slicesFilled = Math.max(
                         0,
                         Math.min(
-                            correctAnswers - previousThreshold,
+                            effectiveCorrectAnswers - previousThreshold,
                             slicesNeeded
                         )
                     );

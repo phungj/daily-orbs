@@ -9,6 +9,7 @@ import day20261110 from "./2026-11-10";
 import day20261111 from "./2026-11-11";
 import day20261122 from "./2026-11-22";
 import day20261124 from "./2026-11-24";
+import day20261125 from "./2026-11-25";
 
 import type { DailySet } from "./days";
 
@@ -24,5 +25,6 @@ export function loadDays(): DailySet[] {
         day20261111,
         day20261122,
         day20261124,
+        day20261125,
     ].sort((a, b) => b.date.localeCompare(a.date));
 }
